@@ -1,0 +1,48 @@
+<h2>Project Mental Health Report</h2>
+<a href="/pm-dashboard/">Back</a>
+<hr>
+
+{% for data in report_data %}
+
+<h3>{{ data.project.project_name }}</h3>
+
+<table border="1" width="100%" cellpadding="8">
+    <tr>
+        <th>Employee</th>
+        <th>Department</th>
+        <th>Mental Health Score</th>
+        <th>Status</th>
+    </tr>
+
+    {% for emp in data.employees %}
+    <tr>
+        <td>{{ emp.employee.full_name }}</td>
+        <td>{{ emp.employee.department }}</td>
+        <td>{{ emp.score|default:"No Data" }}</td>
+
+        <td>
+            {% if emp.score %}
+                {% if emp.score < 40 %}
+                    <span style="color:red;">High Risk</span>
+                {% elif emp.score < 70 %}
+                    <span style="color:orange;">Medium Risk</span>
+                {% else %}
+                    <span style="color:green;">Healthy</span>
+                {% endif %}
+            {% else %}
+                No Data
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">No employees allocated.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<hr>
+
+{% empty %}
+<p>No projects found.</p>
+{% endfor %}

@@ -1,0 +1,38 @@
+<h2>Project Allocation Overview</h2>
+<a href="/pm-dashboard/">Back to Dashboard</a>
+<hr>
+
+{% for data in project_data %}
+
+<h3>{{ data.project.project_name }}</h3>
+<p>
+Employees: {{ data.employee_count }} / {{ data.project.max_employees }}
+</p>
+
+<table border="1" cellpadding="8" width="100%">
+    <tr>
+        <th>Employee</th>
+        <th>Department</th>
+        <th>Hours</th>
+    </tr>
+
+    {% for allocation in data.allocations %}
+    <tr>
+        <td>{{ allocation.employee.full_name }}</td>
+        <td>{{ allocation.employee.department }}</td>
+        <td>{{ allocation.allocated_hours_per_week }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">No employees allocated yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><b>Total Allocated Hours:</b> {{ data.total_hours }}</p>
+
+<hr>
+
+{% empty %}
+<p>No projects created yet.</p>
+{% endfor %}

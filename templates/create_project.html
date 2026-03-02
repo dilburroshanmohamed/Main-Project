@@ -1,0 +1,29 @@
+<h2>Create Project</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Project Name</label>
+    <input type="text" name="project_name" required>
+
+    <br><br>
+
+    <label>Project Description</label>
+    <textarea name="project_description" required></textarea>
+
+
+    <br><br>
+
+    <label>Start Date</label>
+    <input type="date" name="start_date" required>
+
+    <label>End Date</label>
+    <input type="date" name="end_date" required>
+
+
+    
+    <button type="submit">Create Project</button>
+</form>
+
+<br>
+<a href="/pm-dashboard/">Back to Dashboard</a>

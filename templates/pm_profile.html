@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PM Profile</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            padding: 40px;
+        }
+
+        .box {
+            width: 500px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            padding: 8px 14px;
+            background: #2a5298;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background: #1e3c72;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2>Project Manager Profile</h2>
+
+    <p><b>Full Name:</b> {{ profile.full_name }}</p>
+    <p><b>Employee ID:</b> {{ profile.employee_id }}</p>
+    <p><b>Department:</b> {{ profile.department }}</p>
+    <p><b>Job Role:</b> {{ profile.job_role }}</p>
+    <p><b>Experience:</b> {{ profile.work_experience }} years</p>
+    <p><b>Age:</b> {{ profile.age }}</p>
+    <p><b>Gender:</b> {{ profile.gender }}</p>
+
+    <br><br>
+
+    <a href="/pm-dashboard/" class="btn">Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

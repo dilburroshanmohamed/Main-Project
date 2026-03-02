@@ -1,0 +1,15 @@
+<h2>Edit Employee</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <input type="text" name="employee_id" value="{{ employee.employee_id }}">
+    <input type="text" name="full_name" value="{{ employee.full_name }}">
+    <input type="number" name="age" value="{{ employee.age }}">
+    <input type="text" name="gender" value="{{ employee.gender }}">
+    <input type="text" name="department" value="{{ employee.department }}">
+    <input type="text" name="job_role" value="{{ employee.job_role }}">
+    <input type="number" name="work_experience" value="{{ employee.work_experience }}">
+
+    <button type="submit">Update</button>
+</form>

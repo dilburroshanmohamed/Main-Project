@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PM Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            margin: 0;
+        }
+
+        .container {
+            padding: 30px;
+        }
+
+        .profile-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            background: #2a5298;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #1e3c72;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        th {
+            background: #2a5298;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Project Manager Dashboard</h2>
+
+    <div class="profile-box">
+       
+        <br>
+
+        <!-- 🔥 Action Buttons -->
+         <a href="/pm-profile/" class="btn">View Profile</a>
+        <a href="/create-project/" class="btn">Create Project</a>
+        <a href="/allocate-employee/" class="btn">Allocate Employee</a>
+        <a href="/project-allocations/" class="btn">View Allocations</a>
+        <a href="/project-mental-report/" class="btn">Project Mental Report</a>
+        <a href="/logout/" class="btn">Logout</a>
+    </div>
+
+    <h3>Your Projects</h3>
+
+<h3>Your Projects</h3>
+
+{% for data in project_data %}
+
+    <h4>{{ data.project.project_name }}</h4>
+
+    <p><b>Description:</b> {{ data.project.project_description }}</p>
+
+    <p>
+        <b>Allocated:</b>
+        {{ data.allocated_count }}
+        /
+        {{ data.project.max_employees }}
+    </p>
+
+    <table>
+        <tr>
+            <th>Employee</th>
+            <th>Hours</th>
+        </tr>
+
+        {% for allocation in data.allocations %}
+        <tr>
+            <td>{{ allocation.employee.full_name }}</td>
+            <td>{{ allocation.allocated_hours_per_week }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No employees allocated.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+
+{% empty %}
+    <p>No projects created yet.</p>
+{% endfor %}
+</div>
+
+</body>
+</html>
