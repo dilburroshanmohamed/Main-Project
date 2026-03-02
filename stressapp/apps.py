@@ -1,4 +1,3 @@
-# testing app for stress testing the server
 from django.apps import AppConfig
 
 
