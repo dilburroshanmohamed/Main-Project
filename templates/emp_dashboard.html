@@ -2,803 +2,257 @@
 <html>
 <head>
     <title>Employee Dashboard</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #f4f6f9;
-            padding: 40px;
+            margin: 0;
         }
 
-        .box {
-            width: 750px;
-            margin: auto;
-            background: white;
+        .container {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(180deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 15px 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 6px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-links a i {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2a5298;
+            margin-bottom: 20px;
         }
 
         .section {
+            background: white;
+            padding: 20px;
             margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-
-        button {
-            padding: 12px;
-            width: 100%;
-            background: #2a5298;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #1e3c72;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         th, td {
-            padding: 8px;
-            border: 1px solid #ccc;
+            padding: 12px;
             text-align: center;
+            border: 1px solid #ddd;
         }
 
         th {
-            background-color: #2a5298;
+            background: linear-gradient(90deg, #2a5298, #17a2b8);
             color: white;
         }
+
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        tr:hover {
+            background: #e0f2fe;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: linear-gradient(90deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #17a2b8, #117a8b);
+        }
+
+        .alert {
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .alert-high { background: #ffe5e5; color: #b91c1c; }
+        .alert-medium { background: #fff4e5; color: #b45309; }
+        .alert-low { background: #e6ffe6; color: #15803d; }
     </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="container">
 
-<h2>Employee Dashboard</h2>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h3>Employee Panel</h3>
+        <ul class="nav-links">
+            <li><a href="#profile"><i class="fas fa-id-card"></i> Profile</a></li>
+            <li><a href="#projects"><i class="fas fa-briefcase"></i> Assigned Projects</a></li>
+            <li><a href="#stress"><i class="fas fa-heartbeat"></i> Stress Form</a></li>
+            <li><a href="#history"><i class="fas fa-history"></i> Previous History</a></li>
+            <li><a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
 
-<div class="section">
-<h3>My Profile</h3>
-<p><b>Name:</b> {{ profile.full_name }}</p>
-<p><b>Employee ID:</b> {{ profile.employee_id }}</p>
-<p><b>Department:</b> {{ profile.department }}</p>
-<p><b>Job Role:</b> {{ profile.job_role }}</p>
-<p><b>Experience:</b> {{ profile.work_experience }} years</p>
-</div>
+    <!-- Main Content -->
+    <div class="content">
 
-<div class="section">
-<h3>My Projects</h3>
-<table>
-<tr>
-    <th>Project</th>
-    <th>Allocated Hours</th>
-</tr>
-{% for allocation in allocations %}
-<tr>
-    <td>{{ allocation.project.project_name }}</td>
-    <td>{{ allocation.allocated_hours_per_week }}</td>
-</tr>
-{% empty %}
-<tr>
-    <td colspan="2">No projects allocated.</td>
-</tr>
-{% endfor %}
-</table>
+        <h2>Employee Dashboard</h2>
 
-<p><b>Total Weekly Work Hours:</b> {{ total_allocated_hours }}</p>
+        <!-- Profile Section -->
+        <div class="section" id="profile">
+            <h3>My Profile</h3>
+            <p><b>Name:</b> {{ profile.full_name }}</p>
+            <p><b>Employee ID:</b> {{ profile.employee_id }}</p>
+            <p><b>Department:</b> {{ profile.department }}</p>
+            <p><b>Job Role:</b> {{ profile.job_role }}</p>
+            <p><b>Experience:</b> {{ profile.work_experience }} years</p>
+        </div>
 
-{% if total_allocated_hours > 50 %}
-<p style="color:red;">
-⚠ You are overloaded this week. Please discuss with HR.
-</p>
-{% endif %}
-</div>
+        <!-- Projects Section -->
+        <div class="section" id="projects">
+            <h3>Assigned Projects</h3>
+            <table>
+                <tr>
+                    <th>Project</th>
+                    <th>Allocated Hours</th>
+                </tr>
+                {% for allocation in allocations %}
+                <tr>
+                    <td>{{ allocation.project.project_name }}</td>
+                    <td>{{ allocation.allocated_hours_per_week }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">No projects allocated.</td></tr>
+                {% endfor %}
+            </table>
+            <p><b>Total Weekly Work Hours:</b> {{ total_allocated_hours }}</p>
+            {% if total_allocated_hours > 50 %}
+            <p class="alert alert-high">⚠ You are overloaded this week. Please discuss with HR.</p>
+            {% endif %}
+        </div>
 
-<div class="section">
-<h3>Mental Health Assessment</h3>
+        <!-- Stress Form Section -->
+        <div class="section" id="stress">
+            <h3>Mental Health Assessment</h3>
+            <form method="post">
+                {% csrf_token %}
+                <input type="number" step="0.1" name="workload_score" placeholder="Workload Score (1-10)" required>
+                <input type="number" step="0.1" name="job_satisfaction" placeholder="Job Satisfaction (1-10)" required>
+                <input type="number" step="0.1" name="sleep_hours" placeholder="Sleep Hours" required>
+                <input type="number" step="0.1" name="physical_activity" placeholder="Physical Activity Hours" required>
+                <input type="number" step="0.1" name="caffeine" placeholder="Caffeine Intake" required>
+                <input type="number" step="0.1" name="stress_level" placeholder="Stress Level (1-10)" required>
+                <button type="submit">Calculate Mental Health Score</button>
+            </form>
 
-<form method="post">
-    {% csrf_token %}
-    <input type="number" step="0.1" name="workload_score" placeholder="Workload Score (1-10)" required>
-    <input type="number" step="0.1" name="job_satisfaction" placeholder="Job Satisfaction (1-10)" required>
-    <input type="number" step="0.1" name="sleep_hours" placeholder="Sleep Hours" required>
-    <input type="number" step="0.1" name="physical_activity" placeholder="Physical Activity Hours" required>
-    <input type="number" step="0.1" name="caffeine" placeholder="Caffeine Intake" required>
-    <input type="number" step="0.1" name="stress_level" placeholder="Stress Level (1-10)" required>
-    <button type="submit">Calculate Mental Health Score</button>
-</form>
+            {% if score %}
+                {% if status == "High Risk" %}
+                <div class="alert alert-high">
+                {% elif status == "Medium Risk" %}
+                <div class="alert alert-medium">
+                {% else %}
+                <div class="alert alert-low">
+                {% endif %}
+                    <h3>Your Score: {{ score|floatformat:2 }}</h3>
+                    <p><b>Status:</b> {{ status }}</p>
+                    <p><b>Recommendation:</b> {{ recommendation }}</p>
+                </div>
+            {% endif %}
+        </div>
 
-{% if score %}
+        <!-- Previous History Section -->
+        <div class="section" id="history">
+            <h3>Previous Records</h3>
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Score</th>
+                </tr>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ record.mental_health_score|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">No records yet.</td></tr>
+                {% endfor %}
+            </table>
 
-{% if status == "High Risk" %}
-<div style="padding:15px; margin-top:10px; background:#ffe5e5; border-radius:6px;">
-{% elif status == "Medium Risk" %}
-<div style="padding:15px; margin-top:10px; background:#fff4e5; border-radius:6px;">
-{% else %}
-<div style="padding:15px; margin-top:10px; background:#e6ffe6; border-radius:6px;">
-{% endif %}
+            {% if personal_avg %}
+            <p><b>Your Average Score:</b> {{ personal_avg|floatformat:2 }}</p>
+            {% endif %}
+        </div>
 
-    <h3>Your Score: {{ score|floatformat:2 }}</h3>
-    <p><b>Status:</b> {{ status }}</p>
-    <p><b>Recommendation:</b> {{ recommendation }}</p>
-
-</div>
-
-{% endif %}
-</div>
-
-<div class="section">
-<h3>Previous Records</h3>
-<table>
-<tr>
-    <th>Date</th>
-    <th>Score</th>
-</tr>
-{% for record in records %}
-<tr>
-    <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
-    <td>{{ record.mental_health_score|floatformat:2 }}</td>
-</tr>
-{% empty %}
-<tr>
-    <td colspan="2">No records yet.</td>
-</tr>
-{% endfor %}
-</table>
-
-{% if personal_avg %}
-<p><b>Your Average Score:</b> {{ personal_avg|floatformat:2 }}</p>
-{% endif %}
-</div>
-
-<div class="section">
-<h3>Stress Trend Over Time</h3>
-<canvas id="stressChart" height="100"></canvas>
-</div>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- Safely embed Django variables as JSON -->
-{{ chart_labels|json_script:"labels-data" }}
-{{ chart_scores|json_script:"scores-data" }}
-
-<script>
-const labels = JSON.parse(document.getElementById('labels-data').textContent);
-const scores = JSON.parse(document.getElementById('scores-data').textContent);
-
-if (labels.length > 0) {
-    const ctx = document.getElementById('stressChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Mental Health Score',
-                data: scores,
-                borderColor: '#2a5298',
-                backgroundColor: 'rgba(42,82,152,0.2)',
-                borderWidth: 2,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { min: 0, max: 100 }
-            }
-        }
-    });
-}
-</script>
-
-<br>
-<a href="/logout/">Logout</a>
-
+    </div>
 </div>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

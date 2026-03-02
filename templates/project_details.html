@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 30px; }
+        .box {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 { color: #2a5298; margin-bottom: 15px; }
+        p { margin: 8px 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th { background-color: #2a5298; color: white; }
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #17a2b8;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>{{ project.project_name }}</h2>
+    <p><b>Description:</b> {{ project.project_description }}</p>
+    <p><b>Start Date:</b> {{ project.start_date }}</p>
+    <p><b>End Date:</b> {{ project.end_date }}</p>
+    <p><b>Total Employees:</b> {{ employee_count }}</p>
+    <p><b>Total Hours Allocated:</b> {{ total_hours }}</p>
+
+    <h3>Allocated Employees</h3>
+    <table>
+        <tr>
+            <th>Employee</th>
+            <th>Hours per Week</th>
+        </tr>
+        {% for alloc in allocations %}
+        <tr>
+            <td>{{ alloc.employee.full_name }}</td>
+            <td>{{ alloc.allocated_hours_per_week }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">No employees allocated.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+
+<a href="/pm-dashboard/" class="back-link">← Back to Dashboard</a>
+
+</body>
+</html>

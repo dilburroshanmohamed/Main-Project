@@ -9,6 +9,8 @@ urlpatterns = [
     path('pm-dashboard/', views.pm_dashboard, name='pm_dashboard'),
     path('create-project/', views.create_project, name='create_project'),
     path('allocate-employee/', views.allocate_employee, name='allocate_employee'),
+    path('project/<int:project_id>/', views.project_detail, name='project_detail'),
+
     path('pm-profile/', views.pm_profile, name='pm_profile'),
     path('project-allocations/', views.project_allocations, name='project_allocations'),
     path('project-mental-report/', views.project_mental_report, name='project_mental_report'),

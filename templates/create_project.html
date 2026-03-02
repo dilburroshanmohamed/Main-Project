@@ -1,29 +1,119 @@
-<h2>Create Project</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f4f6f9, #dbeafe, #fef3c7);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+        }
 
-<form method="post">
-    {% csrf_token %}
+        .form-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+            width: 500px;
+            border-top: 6px solid #2a5298;
+        }
 
-    <label>Project Name</label>
-    <input type="text" name="project_name" required>
+        h2 {
+            text-align: center;
+            color: #2a5298;
+            margin-bottom: 25px;
+        }
 
-    <br><br>
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
 
-    <label>Project Description</label>
-    <textarea name="project_description" required></textarea>
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s ease;
+        }
 
+        input:focus, textarea:focus {
+            border: 1px solid #2a5298;
+            outline: none;
+            box-shadow: 0 0 5px rgba(42,82,152,0.4);
+        }
 
-    <br><br>
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
 
-    <label>Start Date</label>
-    <input type="date" name="start_date" required>
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
 
-    <label>End Date</label>
-    <input type="date" name="end_date" required>
+        .btn:hover {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+        }
 
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #17a2b8;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
 
-    
-    <button type="submit">Create Project</button>
-</form>
+        .back-link:hover {
+            color: #117a8b;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
 
-<br>
-<a href="/pm-dashboard/">Back to Dashboard</a>
+<div class="form-box">
+    <h2>Create Project</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label style="color:#dc2626;">Project Name</label>
+        <input type="text" name="project_name" required>
+
+        <label style="color:#2563eb;">Project Description</label>
+        <textarea name="project_description" required></textarea>
+
+        <label style="color:#059669;">Start Date</label>
+        <input type="date" name="start_date" required>
+
+        <label style="color:#d97706;">End Date</label>
+        <input type="date" name="end_date" required>
+
+        <button type="submit" class="btn">Create Project</button>
+    </form>
+
+    <a href="/pm-dashboard/" class="back-link">← Back to Dashboard</a>
+</div>
+
+</body>
+</html>

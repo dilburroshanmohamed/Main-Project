@@ -690,6 +690,38 @@ def project_allocations(request):
     })
 
 
+
+from django.shortcuts import get_object_or_404
+
+@login_required
+def project_detail(request, project_id):
+    profile = EmployeeProfile.objects.get(user=request.user)
+
+    if profile.role != 'PM':
+        return redirect('/')
+
+    project = get_object_or_404(Project, id=project_id, created_by=request.user)
+    allocations = ProjectAllocation.objects.filter(project=project)
+
+    total_hours = sum(a.allocated_hours_per_week for a in allocations)
+
+    return render(request, 'project_detail.html', {
+        'project': project,
+        'allocations': allocations,
+        'total_hours': total_hours,
+        'employee_count': allocations.count()
+    })
+
+
+
+
+
+
+
+
+
+
+
 @login_required
 def project_mental_report(request):
 
