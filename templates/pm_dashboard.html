@@ -2,37 +2,77 @@
 <html>
 <head>
     <title>PM Dashboard</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #f4f6f9;
             margin: 0;
         }
 
         .container {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(180deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin: 15px 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-links a i {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
             padding: 30px;
         }
 
-        .profile-box {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        h2 {
+            color: #2a5298;
             margin-bottom: 20px;
-        }
-
-        .btn {
-            padding: 8px 14px;
-            background: #2a5298;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-
-        .btn:hover {
-            background: #1e3c72;
         }
 
         table {
@@ -40,6 +80,7 @@
             background: white;
             border-collapse: collapse;
             margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         table, th, td {
@@ -58,61 +99,49 @@
 
 <div class="container">
 
-    <h2>Project Manager Dashboard</h2>
-
-    <div class="profile-box">
-       
-        <br>
-
-        <!-- 🔥 Action Buttons -->
-         <a href="/pm-profile/" class="btn">View Profile</a>
-        <a href="/create-project/" class="btn">Create Project</a>
-        <a href="/allocate-employee/" class="btn">Allocate Employee</a>
-        <a href="/project-allocations/" class="btn">View Allocations</a>
-        <a href="/project-mental-report/" class="btn">Project Mental Report</a>
-        <a href="/logout/" class="btn">Logout</a>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h3>PM Panel</h3>
+        <ul class="nav-links">
+            <li><a href="/pm-profile/"><i class="fas fa-user"></i> View Profile</a></li>
+            <li><a href="/create-project/"><i class="fas fa-folder-plus"></i> Create Project</a></li>
+            <li><a href="/allocate-employee/"><i class="fas fa-users-cog"></i> Allocate Employee</a></li>
+            <li><a href="/project-allocations/"><i class="fas fa-tasks"></i> View Allocations</a></li>
+            <li><a href="/project-mental-report/"><i class="fas fa-chart-line"></i> Project Mental Report</a></li>
+            <li><a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
     </div>
 
-    <h3>Your Projects</h3>
+    <!-- Main Content -->
+    <div class="content">
 
-<h3>Your Projects</h3>
+        <h2>Project Manager Dashboard</h2>
 
-{% for data in project_data %}
+        <h3>Your Projects</h3>
+        {% for data in project_data %}
+            <h4>{{ data.project.project_name }}</h4>
+            <p><b>Description:</b> {{ data.project.project_description }}</p>
+            <p><b>Allocated:</b> {{ data.allocated_count }} / {{ data.project.max_employees }}</p>
 
-    <h4>{{ data.project.project_name }}</h4>
-
-    <p><b>Description:</b> {{ data.project.project_description }}</p>
-
-    <p>
-        <b>Allocated:</b>
-        {{ data.allocated_count }}
-        /
-        {{ data.project.max_employees }}
-    </p>
-
-    <table>
-        <tr>
-            <th>Employee</th>
-            <th>Hours</th>
-        </tr>
-
-        {% for allocation in data.allocations %}
-        <tr>
-            <td>{{ allocation.employee.full_name }}</td>
-            <td>{{ allocation.allocated_hours_per_week }}</td>
-        </tr>
+            <table>
+                <tr>
+                    <th>Employee</th>
+                    <th>Hours</th>
+                </tr>
+                {% for allocation in data.allocations %}
+                <tr>
+                    <td>{{ allocation.employee.full_name }}</td>
+                    <td>{{ allocation.allocated_hours_per_week }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2">No employees allocated.</td></tr>
+                {% endfor %}
+            </table>
+            <hr>
         {% empty %}
-        <tr>
-            <td colspan="2">No employees allocated.</td>
-        </tr>
+            <p>No projects created yet.</p>
         {% endfor %}
-    </table>
-
-    <hr>
-
-{% empty %}
-    <p>No projects created yet.</p>
-{% endfor %}
+    </div>
 </div>
 
 </body>

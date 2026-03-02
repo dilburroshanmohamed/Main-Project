@@ -13,5 +13,8 @@ urlpatterns = [
     path('project-allocations/', views.project_allocations, name='project_allocations'),
     path('project-mental-report/', views.project_mental_report, name='project_mental_report'),
     path('login/', views.user_login, name='login'),
+    path('view-employees/', views.view_employees, name='view_employees'),
+    path('view-project-managers/', views.view_project_managers, name='view_project_managers'),
+
     path("logout/", views.logout_view, name="logout"),
 ]

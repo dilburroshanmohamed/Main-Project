@@ -778,3 +778,19 @@ def project_mental_report(request):
 def logout_view(request):
     logout(request) # clears the session 
     return redirect('login')
+
+
+@login_required
+def view_employees(request):
+    if not request.user.is_staff:
+        return redirect('/')
+    employees = EmployeeProfile.objects.filter(role='EMP')
+    return render(request, 'view_emp.html', {'employees': employees})
+
+
+@login_required
+def view_project_managers(request):
+    if not request.user.is_staff:
+        return redirect('/')
+    managers = EmployeeProfile.objects.filter(role='PM')
+    return render(request, 'view_pm.html', {'managers': managers})
