@@ -1,67 +1,50 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.db.models import Max
-from .models import StressRecord, EmployeeProfile, Project, ProjectAllocation
 from django.db.models import Avg
-from django.contrib.auth import logout 
-from django.shortcuts import redirect
-import joblib
-import os
+import joblib, os
+
+from .models import StressRecord, EmployeeProfile, Project, ProjectAllocation
 
 # 🔹 Load ML model
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 model = joblib.load(os.path.join(BASE_DIR, "stress_model.pkl"))
 scaler = joblib.load(os.path.join(BASE_DIR, "scaler.pkl"))
 
-
 # 🔹 Home Page
 def home(request):
     return render(request, 'admin_home.html')
 
-
-# 🔹 Common Login
-
+# 🔹 Login
 def user_login(request):
     error = None
-
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
 
-            # 👑 Admin (HR)
-            if user.is_staff:
+            if user.is_superuser or user.is_staff:
                 return redirect('/admin-dashboard/')
 
-            # Get employee profile
-            profile = EmployeeProfile.objects.get(user=user)
-
-            # 👨‍💼 Project Manager
-            if profile.role == 'PM':
-                return redirect('/pm-dashboard/')
-
-            # 👨‍💻 Employee
-            return redirect('/employee-dashboard/')
-
+            profile = EmployeeProfile.objects.filter(user=user).first()
+            if profile:
+                if profile.role == 'PM':
+                    return redirect('/pm-dashboard/')
+                elif profile.role == 'EMP':
+                    return redirect('/employee-dashboard/')
+            return redirect('/')
         else:
             error = "Invalid credentials"
-
     return render(request, 'login.html', {'error': error})
 
 # 🔹 Admin Dashboard
-from .models import Project, ProjectAllocation
-from django.db.models import Avg
-
 @login_required
 def admin_dashboard(request):
-
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return redirect('/')
 
     employees = EmployeeProfile.objects.all()
@@ -72,10 +55,7 @@ def admin_dashboard(request):
     total_employees = employees.count()
     total_projects = projects.count()
     total_allocations = allocations.count()
-
     avg_score = records.aggregate(Avg('mental_health_score'))['mental_health_score__avg']
-
-    # High risk employees
     high_risk_records = StressRecord.objects.filter(mental_health_score__lt=40)
 
     return render(request, 'admin_dashboard.html', {
@@ -87,20 +67,17 @@ def admin_dashboard(request):
         'high_risk_records': high_risk_records
     })
 
-
-
+# 🔹 PM Dashboard
 @login_required
 def pm_dashboard(request):
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+    if not profile or profile.role != 'PM':
+        if request.user.is_superuser:
+            return redirect('/admin-dashboard/')
         return redirect('/')
 
     projects = Project.objects.filter(created_by=request.user)
-
     project_data = []
-
     for project in projects:
         allocations = ProjectAllocation.objects.filter(project=project)
         project_data.append({
@@ -109,109 +86,53 @@ def pm_dashboard(request):
             'allocated_count': allocations.count()
         })
 
-    return render(request, 'pm_dashboard.html', {
-        'project_data': project_data
-    })
-    profile = EmployeeProfile.objects.get(user=request.user)
+    return render(request, 'pm_dashboard.html', {'project_data': project_data})
 
-    if profile.role != 'PM':
-        return redirect('/')
-
-    projects = Project.objects.filter(created_by=request.user)
-
-    allocations = ProjectAllocation.objects.filter(
-        project__created_by=request.user
-    )
-
-    return render(request, 'pm_dashboard.html', {
-        'projects': projects,
-        'allocations': allocations
-    })
-
-
-
-
+# 🔹 PM Profile
 @login_required
 def pm_profile(request):
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+    if not profile or profile.role != 'PM':
         return redirect('/')
-
-    return render(request, 'pm_profile.html', {
-        'profile': profile
-    })
-
-
-
+    return render(request, 'pm_profile.html', {'profile': profile})
 
 # 🔹 Add Employee
 @login_required
 def add_employee(request):
-
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return redirect('/')
-
     message = None
-
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        employee_id = request.POST.get('employee_id')
-        full_name = request.POST.get('full_name')
-        age = request.POST.get('age')
-        gender = request.POST.get('gender')
-        department = request.POST.get('department')
-        job_role = request.POST.get('job_role')
-        work_experience = request.POST.get('work_experience')
-        role = request.POST.get('role')
-        user = User.objects.create_user(username=username, password=password)
-
-
+        user = User.objects.create_user(
+            username=request.POST.get('username'),
+            password=request.POST.get('password')
+        )
         EmployeeProfile.objects.create(
             user=user,
-            employee_id=employee_id,
-            full_name=full_name,
-            age=age,
-            gender=gender,
-            department=department,
-            job_role=job_role,
-            work_experience=work_experience,
-            role=role
+            employee_id=request.POST.get('employee_id'),
+            full_name=request.POST.get('full_name'),
+            age=request.POST.get('age'),
+            gender=request.POST.get('gender'),
+            department=request.POST.get('department'),
+            job_role=request.POST.get('job_role'),
+            work_experience=request.POST.get('work_experience'),
+            role=request.POST.get('role')
         )
-
         message = "Employee Registered Successfully"
-
     return render(request, 'add_emp.html', {'message': message})
 
-
-# 🔹 Employee Dashboard (ML Prediction)
+# 🔹 Employee Dashboard
 @login_required
-def dashboard(request):
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    # Allow only employees
-    if profile.role != 'EMP':
+def employee_dashboard(request):
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+    if not profile or profile.role != 'EMP':
         return redirect('/')
 
-    # Get allocated projects
     allocations = ProjectAllocation.objects.filter(employee=profile)
+    total_allocated_hours = sum(a.allocated_hours_per_week for a in allocations)
 
-    # Calculate total weekly hours automatically
-    total_allocated_hours = sum(
-        allocation.allocated_hours_per_week
-        for allocation in allocations
-    )
-
-    # Initialize variables
-    score = None
-    status = None
-    recommendation = None
-
+    score, status, recommendation = None, None, None
     if request.method == 'POST':
-
         workload_score = float(request.POST.get('workload_score'))
         job_satisfaction = float(request.POST.get('job_satisfaction'))
         sleep_hours = float(request.POST.get('sleep_hours'))
@@ -219,7 +140,6 @@ def dashboard(request):
         caffeine = float(request.POST.get('caffeine'))
         stress_level = float(request.POST.get('stress_level'))
 
-        # 🔥 Use allocated hours automatically
         input_data = [[
             total_allocated_hours,
             workload_score,
@@ -229,100 +149,19 @@ def dashboard(request):
             caffeine,
             stress_level
         ]]
-
-        # ML Prediction
         input_scaled = scaler.transform(input_data)
         score = model.predict(input_scaled)[0]
 
-        # Determine status
         if score < 40:
             status = "High Risk"
-        elif score < 70:
-            status = "Medium Risk"
-        else:
-            status = "Healthy"
-
-        # Recommendation system
-        if score < 40:
             recommendation = "You are under high stress. Reduce workload, improve sleep, reduce caffeine, and consider taking leave."
         elif score < 70:
+            status = "Medium Risk"
             recommendation = "Moderate stress detected. Improve sleep schedule and increase physical activity."
         else:
+            status = "Healthy"
             recommendation = "Good mental health. Maintain work-life balance and healthy routine."
 
-        # Save record
-        StressRecord.objects.create(
-            user=request.user,
-            work_hours_per_week=total_allocated_hours,
-            workload_score=workload_score,
-            job_satisfaction=job_satisfaction,
-            sleep_hours=sleep_hours,
-            physical_activity_hrs=physical_activity,
-            caffeine_intake=caffeine,
-            stress_level=stress_level,
-            mental_health_score=score
-        )
-
-    # Get previous records
-    records = StressRecord.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
-
-    return render(request, 'emp_dashboard.html', {
-        'profile': profile,
-        'allocations': allocations,
-        'total_allocated_hours': total_allocated_hours,
-        'score': score,
-        'status': status,
-        'recommendation': recommendation,
-        'records': records
-    })
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'EMP':
-        return redirect('/')
-
-    allocations = ProjectAllocation.objects.filter(employee=profile)
-
-    total_allocated_hours = sum(
-        allocation.allocated_hours_per_week
-        for allocation in allocations
-    )
-
-    score = None
-    status = None
-
-    if request.method == 'POST':
-
-        workload_score = float(request.POST.get('workload_score'))
-        job_satisfaction = float(request.POST.get('job_satisfaction'))
-        sleep_hours = float(request.POST.get('sleep_hours'))
-        physical_activity = float(request.POST.get('physical_activity'))
-        caffeine = float(request.POST.get('caffeine'))
-        stress_level = float(request.POST.get('stress_level'))
-
-        input_data = [[
-            total_allocated_hours,
-            workload_score,
-            job_satisfaction,
-            sleep_hours,
-            physical_activity,
-            caffeine,
-            stress_level
-        ]]
-
-        input_scaled = scaler.transform(input_data)
-        score = model.predict(input_scaled)[0]
-
-        # Determine status
-        if score < 40:
-            status = "High Risk"
-        elif score < 70:
-            status = "Medium Risk"
-        else:
-            status = "Healthy"
-
         StressRecord.objects.create(
             user=request.user,
             work_hours_per_week=total_allocated_hours,
@@ -336,67 +175,8 @@ def dashboard(request):
         )
 
     records = StressRecord.objects.filter(user=request.user).order_by('-created_at')
-
-    return render(request, 'emp_dashboard.html', {
-        'profile': profile,
-        'allocations': allocations,
-        'total_allocated_hours': total_allocated_hours,
-        'score': score,
-        'status': status,
-        'records': records
-    })
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    # Only employee allowed
-    if profile.role != 'EMP':
-        return redirect('/')
-
-    score = None
-
-    if request.method == 'POST':
-
-        work_hours = float(request.POST.get('work_hours'))
-        workload_score = float(request.POST.get('workload_score'))
-        job_satisfaction = float(request.POST.get('job_satisfaction'))
-        sleep_hours = float(request.POST.get('sleep_hours'))
-        physical_activity = float(request.POST.get('physical_activity'))
-        caffeine = float(request.POST.get('caffeine'))
-        stress_level = float(request.POST.get('stress_level'))
-
-        input_data = [[
-            work_hours,
-            workload_score,
-            job_satisfaction,
-            sleep_hours,
-            physical_activity,
-            caffeine,
-            stress_level
-        ]]
-
-        input_scaled = scaler.transform(input_data)
-        score = model.predict(input_scaled)[0]
-
-        StressRecord.objects.create(
-            user=request.user,
-            work_hours_per_week=work_hours,
-            workload_score=workload_score,
-            job_satisfaction=job_satisfaction,
-            sleep_hours=sleep_hours,
-            physical_activity_hrs=physical_activity,
-            caffeine_intake=caffeine,
-            stress_level=stress_level,
-            mental_health_score=score
-        )
-
-    records = StressRecord.objects.filter(user=request.user).order_by('-created_at')
-
-    # Prepare data for chart
-    chart_labels = []
-    chart_scores = []
-
-    for record in records[::-1]:  # oldest to newest
-        chart_labels.append(record.created_at.strftime("%Y-%m-%d"))
-        chart_scores.append(record.mental_health_score)
+    chart_labels = [r.created_at.strftime("%Y-%m-%d") for r in records[::-1]]
+    chart_scores = [r.mental_health_score for r in records[::-1]]
 
     return render(request, 'emp_dashboard.html', {
         'profile': profile,
@@ -408,91 +188,45 @@ def dashboard(request):
         'records': records,
         'chart_labels': chart_labels,
         'chart_scores': chart_scores
-
     })
 
-
-
-
+# 🔹 Project Management
 @login_required
 def create_project(request):
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+    if not profile or profile.role != 'PM':
         return redirect('/')
-
     if request.method == 'POST':
-        project_name = request.POST.get('project_name')
-        project_description = request.POST.get('project_description')
-        max_employees = request.POST.get('max_employees')
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
-
         Project.objects.create(
-            project_name=project_name,
-            project_description=project_description,
-            max_employees=max_employees,
-            start_date=start_date,
-            end_date=end_date,
+            project_name=request.POST.get('project_name'),
+            project_description=request.POST.get('project_description'),
+            max_employees=request.POST.get('max_employees'),
+            start_date=request.POST.get('start_date'),
+            end_date=request.POST.get('end_date'),
             created_by=request.user
         )
-
         return redirect('/pm-dashboard/')
-
     return render(request, 'create_project.html')
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
-        return redirect('/')
-
-    if request.method == 'POST':
-        name = request.POST.get('project_name')
-        desc = request.POST.get('project_description')
-
-        Project.objects.create(
-            project_name=name,
-            project_description=desc,
-            created_by=request.user
-        )
-
-        return redirect('/pm-dashboard/')
-
-    return render(request, 'create_project.html')
-
-
 
 @login_required
 def allocate_employee(request):
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+    if not profile or profile.role != 'PM':
         return redirect('/')
-
     employees = EmployeeProfile.objects.filter(role='EMP')
     projects = Project.objects.filter(created_by=request.user)
-
     error = None
-
     if request.method == 'POST':
         project_id = request.POST.get('project')
         selected_employees = request.POST.getlist('employees')
-
         project = Project.objects.get(id=project_id)
-
-        # Count existing allocations
         current_count = ProjectAllocation.objects.filter(project=project).count()
-
-        # Check max limit
         if current_count + len(selected_employees) > project.max_employees:
             error = f"Only {project.max_employees - current_count} slots remaining!"
         else:
             for emp_id in selected_employees:
                 employee = EmployeeProfile.objects.get(id=emp_id)
-
                 hours = request.POST.get(f'hours_{emp_id}')
-
                 if hours:
                     ProjectAllocation.objects.create(
                         employee=employee,
@@ -500,209 +234,49 @@ def allocate_employee(request):
                         allocated_hours_per_week=hours,
                         allocated_by=request.user
                     )
-
             return redirect('/project-allocations/')
-
     return render(request, 'allocate_employee.html', {
         'employees': employees,
         'projects': projects,
         'error': error
     })
-    profile = EmployeeProfile.objects.get(user=request.user)
 
-    if profile.role != 'PM':
-        return redirect('/')
-
-    employees = EmployeeProfile.objects.filter(role='EMP')
-    projects = Project.objects.filter(created_by=request.user)
-
-    if request.method == 'POST':
-        selected_employees = request.POST.getlist('employees')
-        project_id = request.POST.get('project')
-        hours = request.POST.get('hours')
-
-        project = Project.objects.get(id=project_id)
-
-        for emp_id in selected_employees:
-            employee = EmployeeProfile.objects.get(id=emp_id)
-
-            ProjectAllocation.objects.create(
-                employee=employee,
-                project=project,
-                allocated_hours_per_week=hours,
-                allocated_by=request.user
-            )
-
-        return redirect('/project-allocations/')
-
-    return render(request, 'allocate_employee.html', {
-        'employees': employees,
-        'projects': projects
-    })
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    # Only PM allowed
-    if profile.role != 'PM':
-        return redirect('/')
-
-    employees = EmployeeProfile.objects.filter(role='EMP')
-    projects = Project.objects.filter(created_by=request.user)
-
-    if request.method == 'POST':
-        employee_id = request.POST.get('employee')
-        project_id = request.POST.get('project')
-        hours = request.POST.get('hours')
-
-        employee = EmployeeProfile.objects.get(id=employee_id)
-        project = Project.objects.get(id=project_id)
-
-        ProjectAllocation.objects.create(
-            employee=employee,
-            project=project,
-            allocated_hours_per_week=hours,
-            allocated_by=request.user
-        )
-
-        return redirect('/pm-dashboard/')
-
-    return render(request, 'allocate_employee.html', {
-        'employees': employees,
-        'projects': projects
-    })
-
-
-
+# 🔹 Project Allocations (Admin + PM)
 @login_required
 def project_allocations(request):
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+    if request.user.is_superuser:
+        projects = Project.objects.all()
+    elif profile and profile.role == 'PM':
+        projects = Project.objects.filter(created_by=request.user)
+    else:
         return redirect('/')
 
-    projects = Project.objects.filter(created_by=request.user)
-
     project_data = []
-
     for project in projects:
         allocations = ProjectAllocation.objects.filter(project=project)
-
-        allocation_data = []
-
-        for allocation in allocations:
-
-            latest_record = StressRecord.objects.filter(
-                user=allocation.employee.user
-            ).order_by('-created_at').first()
-
-            if latest_record:
-                score = latest_record.mental_health_score
-            else:
-                score = None
-
-            allocation_data.append({
-                'employee': allocation.employee,
-                'hours': allocation.allocated_hours_per_week,
-                'score': score
-            })
-
-        total_hours = sum(
-            allocation.allocated_hours_per_week
-            for allocation in allocations
-        )
-
-        project_data.append({
-            'project': project,
-            'allocations': allocation_data,
-            'total_hours': total_hours,
-            'employee_count': allocations.count()
-        })
-
-    return render(request, 'project_allocations.html', {
-        'project_data': project_data
-    })
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
-        return redirect('/')
-
-    projects = Project.objects.filter(created_by=request.user)
-
-    project_data = []
-
-    for project in projects:
-        allocations = ProjectAllocation.objects.filter(project=project)
-
-        total_hours = sum(
-            allocation.allocated_hours_per_week
-            for allocation in allocations
-        )
-
+        total_hours = sum(a.allocated_hours_per_week for a in allocations)
         project_data.append({
             'project': project,
             'allocations': allocations,
             'total_hours': total_hours,
             'employee_count': allocations.count()
         })
+    return render(request, 'project_allocations.html', {'project_data': project_data})
 
-    return render(request, 'project_allocations.html', {
-        'project_data': project_data
-    })
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
-        return redirect('/')
-
-    projects = Project.objects.filter(created_by=request.user)
-
-    project_data = []
-
-    for project in projects:
-        allocations = ProjectAllocation.objects.filter(project=project)
-
-        total_hours = sum(
-            allocation.allocated_hours_per_week
-            for allocation in allocations
-        )
-
-        project_data.append({
-            'project': project,
-            'allocations': allocations,
-            'total_hours': total_hours,
-            'employee_count': allocations.count()
-        })
-
-    return render(request, 'project_allocations.html', {
-        'project_data': project_data
-    })
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
-        return redirect('/')
-
-    allocations = ProjectAllocation.objects.filter(
-        project__created_by=request.user
-    ).select_related('employee', 'project')
-
-    return render(request, 'project_allocations.html', {
-        'allocations': allocations
-    })
-
-
-
-from django.shortcuts import get_object_or_404
-
+# 🔹 Project Detail
 @login_required
 def project_detail(request, project_id):
-    profile = EmployeeProfile.objects.get(user=request.user)
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
 
-    if profile.role != 'PM':
+    if request.user.is_superuser:
+        project = get_object_or_404(Project, id=project_id)
+    elif profile and profile.role == 'PM':
+        project = get_object_or_404(Project, id=project_id, created_by=request.user)
+    else:
         return redirect('/')
 
-    project = get_object_or_404(Project, id=project_id, created_by=request.user)
     allocations = ProjectAllocation.objects.filter(project=project)
-
     total_hours = sum(a.allocated_hours_per_week for a in allocations)
 
     return render(request, 'project_detail.html', {
@@ -712,117 +286,106 @@ def project_detail(request, project_id):
         'employee_count': allocations.count()
     })
 
-
-
-
-
-
-
-
-
-
-
+# 🔹 Project Mental Report (PM only)
 @login_required
 def project_mental_report(request):
-
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+    if not profile or profile.role != 'PM':
         return redirect('/')
 
     projects = Project.objects.filter(created_by=request.user)
-
-    report_data = []
-
-    # Get all stress records once
-    latest_records = {}
-
-    all_records = StressRecord.objects.order_by('user', '-created_at')
-
-    for record in all_records:
-        if record.user_id not in latest_records:
-            latest_records[record.user_id] = record
-
-    for project in projects:
-        allocations = ProjectAllocation.objects.filter(project=project)
-
-        employee_data = []
-
-        for allocation in allocations:
-            record = latest_records.get(allocation.employee.user.id)
-
-            if record:
-                score = record.mental_health_score
-            else:
-                score = None
-
-            employee_data.append({
-                'employee': allocation.employee,
-                'score': score
-            })
-
-        report_data.append({
-            'project': project,
-            'employees': employee_data
-        })
-
-    return render(request, 'project_mental_report.html', {
-        'report_data': report_data
-    })
-    profile = EmployeeProfile.objects.get(user=request.user)
-
-    if profile.role != 'PM':
-        return redirect('/')
-
-    projects = Project.objects.filter(created_by=request.user)
-
     report_data = []
 
     for project in projects:
         allocations = ProjectAllocation.objects.filter(project=project)
-
         employee_data = []
-
         for allocation in allocations:
             latest_record = StressRecord.objects.filter(
                 user=allocation.employee.user
             ).order_by('-created_at').first()
-
-            if latest_record:
-                score = latest_record.mental_health_score
-            else:
-                score = None
-
+            score = latest_record.mental_health_score if latest_record else None
             employee_data.append({
                 'employee': allocation.employee,
                 'score': score
             })
-
         report_data.append({
             'project': project,
             'employees': employee_data
         })
 
-    return render(request, 'project_mental_report.html', {
-        'report_data': report_data
-    })
+    return render(request, 'project_mental_report.html', {'report_data': report_data})
 
+# 🔹 Logout
 def logout_view(request):
-    logout(request) # clears the session 
+    logout(request)
     return redirect('login')
 
-
+# 🔹 View Employees (Admin only)
 @login_required
 def view_employees(request):
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return redirect('/')
     employees = EmployeeProfile.objects.filter(role='EMP')
     return render(request, 'view_emp.html', {'employees': employees})
 
-
+# 🔹 View Project Managers (Admin only)
 @login_required
 def view_project_managers(request):
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return redirect('/')
     managers = EmployeeProfile.objects.filter(role='PM')
     return render(request, 'view_pm.html', {'managers': managers})
+
+# 🔹 Login Redirect (role-based)
+@login_required
+def login_redirect(request):
+    if request.user.is_superuser:
+        return redirect('/admin-dashboard/')
+    else:
+        profile = EmployeeProfile.objects.filter(user=request.user).first()
+        if profile and profile.role == 'PM':
+            return redirect('/pm-dashboard/')
+        elif profile and profile.role == 'EMP':
+            return redirect('/employee-dashboard/')
+        else:
+            return redirect('/')
+
+
+
+@login_required
+def admin_project_allocations(request):
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    projects = Project.objects.all()
+    project_data = []
+    for project in projects:
+        allocations = ProjectAllocation.objects.filter(project=project)
+        total_hours = sum(a.allocated_hours_per_week for a in allocations)
+        project_data.append({
+            'project': project,
+            'allocations': allocations,
+            'total_hours': total_hours,
+            'employee_count': allocations.count()
+        })
+
+    return render(request, 'admin_project_allocation.html', {
+        'project_data': project_data
+    })
+
+
+@login_required
+def admin_project_detail(request, project_id):
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    project = get_object_or_404(Project, id=project_id)
+    allocations = ProjectAllocation.objects.filter(project=project)
+    total_hours = sum(a.allocated_hours_per_week for a in allocations)
+
+    return render(request, 'admin_project_details.html', {
+        'project': project,
+        'allocations': allocations,
+        'total_hours': total_hours,
+        'employee_count': allocations.count()
+    })
