@@ -60,6 +60,7 @@ def admin_dashboard(request):
 
     return render(request, 'admin_dashboard.html', {
         'employees': employees,
+        'records': records,   # ✅ ADD THIS LINE
         'total_employees': total_employees,
         'total_projects': total_projects,
         'total_allocations': total_allocations,

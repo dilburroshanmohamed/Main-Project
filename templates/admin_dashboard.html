@@ -208,6 +208,33 @@
             {% endfor %}
         </table>
 
+
+        <h3>Employee Stress Records</h3>
+
+<table border="1" width="100%">
+<tr>
+<th>Employee</th>
+<th>Score</th>
+<th>Date</th>
+</tr>
+
+{% for record in records %}
+
+<tr>
+<td>{{ record.user.username }}</td>
+<td>{{ record.mental_health_score|floatformat:2 }}</td>
+<td>{{ record.created_at }}</td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="3">No records found</td>
+</tr>
+
+{% endfor %}
+
+</table>
     </div>
 </div>
 
