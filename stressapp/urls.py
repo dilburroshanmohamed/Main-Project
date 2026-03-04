@@ -32,4 +32,6 @@ urlpatterns = [
     # Auth
     path('login/', views.user_login, name='login'),
     path("logout/", views.logout_view, name="logout"),
+
+    path('view-stress-records/', views.view_stress_records, name='view_stress_records'),
 ]

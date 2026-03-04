@@ -390,3 +390,13 @@ def admin_project_detail(request, project_id):
         'total_hours': total_hours,
         'employee_count': allocations.count()
     })
+
+
+
+@login_required
+def view_stress_records(request):
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    records = StressRecord.objects.select_related('user').order_by('-created_at')
+    return render(request, 'view_stress_records.html', {'records': records})

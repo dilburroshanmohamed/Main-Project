@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Stress Records</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:40px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ccc;
+text-align:center;
+}
+
+th{
+background:#2a5298;
+color:white;
+}
+
+.btn{
+padding:8px 15px;
+background:#2a5298;
+color:white;
+text-decoration:none;
+border-radius:4px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Employee Mental Health Records</h2>
+
+<a href="/admin-dashboard/" class="btn">Back to Dashboard</a>
+
+<br><br>
+
+<table>
+
+<tr>
+<th>Employee</th>
+<th>Mental Health Score</th>
+<th>Stress Level</th>
+<th>Date</th>
+</tr>
+
+{% for record in records %}
+
+<tr>
+<td>{{ record.user.username }}</td>
+<td>{{ record.mental_health_score|floatformat:2 }}</td>
+<td>{{ record.stress_level }}</td>
+<td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4">No records available</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
