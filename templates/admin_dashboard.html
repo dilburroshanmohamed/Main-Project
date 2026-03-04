@@ -127,13 +127,12 @@
             <li><a href="/add-employee/"><i class="fas fa-user-plus"></i> Add Employee</a></li>
             <li><a href="{% url 'view_employees' %}"><i class="fas fa-users"></i> View Employees</a></li>
             <li><a href="{% url 'view_project_managers' %}"><i class="fas fa-user-tie"></i> View Project Managers</a></li>
-            <li><a href="/admin-records/"><i class="fas fa-chart-line"></i> View Stress Records</a></li>
-            <li><a href="/view-stress-records/" class="btn">View Stress Records</a></li>
 
 
     <!-- ✅ Connect Admin-specific pages -->
             <li><a href="{% url 'admin_project_detail' 1 %}"><i class="fas fa-folder-open"></i> Project Details</a></li>
             <li><a href="{% url 'admin_project_allocations' %}"><i class="fas fa-tasks"></i> Project Allocation</a></li>
+            <li><a href="/view-stress-records/"><i class="fas fa-chart-line"></i> View Stress Records</a></li>
 
             <li><a href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
