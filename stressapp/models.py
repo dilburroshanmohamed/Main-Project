@@ -40,6 +40,7 @@ class Project(models.Model):
 
 
 class ProjectAllocation(models.Model):
+
     employee = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     allocated_hours_per_week = models.FloatField()
@@ -49,6 +50,8 @@ class ProjectAllocation(models.Model):
     def __str__(self):
         return f"{self.employee.full_name} - {self.project.project_name}"
 
+    class Meta:
+        unique_together = ('employee', 'project')
 
 class StressRecord(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
