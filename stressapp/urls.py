@@ -6,7 +6,7 @@ urlpatterns = [
     path('login-redirect/', views.login_redirect, name='login_redirect'),
 
     # Dashboards
-    path('employee-dashboard/', views.employee_dashboard, name='employee_dashboard'),
+    path('employee-dashboard/', views.employee_dashboard, name='emp_dashboard'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('pm-dashboard/', views.pm_dashboard, name='pm_dashboard'),
 

@@ -179,7 +179,7 @@ def employee_dashboard(request):
     chart_labels = [r.created_at.strftime("%Y-%m-%d") for r in records[::-1]]
     chart_scores = [r.mental_health_score for r in records[::-1]]
 
-    return render(request, 'emp_dashboard.html', {
+    return render(request, 'emp/emp_dashboard.html', {
         'profile': profile,
         'allocations': allocations,
         'total_allocated_hours': total_allocated_hours,
