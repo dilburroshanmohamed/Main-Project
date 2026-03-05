@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mental Health Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .assessment-card {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .assessment-card h2 {
+            text-align: center;
+            color: #2a5298;
+            margin-bottom: 25px;
+            font-size: 26px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        input {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            grid-column: span 2;
+            padding: 12px;
+            background: linear-gradient(90deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #17a2b8, #117a8b);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .high-risk { background: #ffe5e5; color: #b91c1c; }
+        .medium-risk { background: #fff4e5; color: #b45309; }
+        .healthy { background: #e6ffe6; color: #15803d; }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-link {
+            display: inline-block;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #2a5298, #1e3c72);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .btn-link:hover {
+            background: linear-gradient(90deg, #17a2b8, #117a8b);
+        }
+    </style>
+</head>
+<body>
+
+<div class="assessment-card">
+    <h2><i class="fas fa-heartbeat"></i> Mental Health Assessment</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="number" name="workload_score" placeholder="Workload (1-10)" required>
+        <input type="number" name="job_satisfaction" placeholder="Job Satisfaction (1-10)" required>
+        <input type="number" name="sleep_hours" placeholder="Sleep Hours" required>
+        <input type="number" name="physical_activity" placeholder="Physical Activity Hours" required>
+        <input type="number" name="caffeine" placeholder="Caffeine Intake" required>
+        <input type="number" name="stress_level" placeholder="Stress Level (1-10)" required>
+        <button type="submit">Calculate</button>
+    </form>
+
+    {% if score %}
+        <div class="result 
+            {% if status == 'High Risk' %}high-risk{% elif status == 'Medium Risk' %}medium-risk{% else %}healthy{% endif %}">
+            <h3>Your Score: {{ score|floatformat:2 }}</h3>
+            <p><b>Status:</b> {{ status }}</p>
+            <p><b>Recommendation:</b> {{ recommendation }}</p>
+        </div>
+    {% endif %}
+
+    <div class="btn-container">
+        <a href="{% url 'emp_history' %}" class="btn-link">Go to History →</a>
+    </div>
+</div>
+
+</body>
+</html>

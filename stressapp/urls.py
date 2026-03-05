@@ -34,5 +34,10 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
 
     path('view-stress-records/', views.view_stress_records, name='view_stress_records'),
-    path('mental-report/', views.project_mental_report, name='mental_report')
+    path('mental-report/', views.project_mental_report, name='mental_report'),
+
+    path('emp/profile/', views.emp_profile, name='emp_profile'),
+    path('emp/projects/', views.emp_projects, name='emp_projects'),
+    path('emp/stress/', views.emp_stress_form, name='emp_stress_form'),
+    path('emp/history/', views.emp_history, name='emp_history'),
 ]

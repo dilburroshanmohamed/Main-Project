@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Previous Records</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .records-card {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .records-card h2 {
+            text-align: center;
+            color: #2a5298;
+            margin-bottom: 25px;
+            font-size: 26px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: linear-gradient(90deg, #2a5298, #17a2b8);
+            color: white;
+        }
+
+        tr:nth-child(even) { background: #f9fafb; }
+        tr:hover { background: #e0f2fe; }
+
+        .average {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2a5298;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #2a5298, #1e3c72);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, #17a2b8, #117a8b);
+        }
+
+        .btn-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="records-card">
+    <h2><i class="fas fa-history"></i> Previous Records</h2>
+
+    <table>
+        <tr><th>Date</th><th>Score</th></tr>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ record.mental_health_score|floatformat:2 }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">No records yet.</td></tr>
+        {% endfor %}
+    </table>
+
+    {% if personal_avg %}
+    <p class="average"><i class="fas fa-chart-line"></i> Your Average Score: {{ personal_avg|floatformat:2 }}</p>
+    {% endif %}
+
+    <div class="btn-container">
+        <a href="{% url 'emp_profile' %}" class="btn">← Back to Profile</a>
+    </div>
+</div>
+
+</body>
+</html>

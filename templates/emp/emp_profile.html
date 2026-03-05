@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .profile-card {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: left;
+        }
+
+        .profile-card h2 {
+            text-align: center;
+            color: #2a5298;
+            margin-bottom: 25px;
+            font-size: 26px;
+        }
+
+        .profile-item {
+            margin: 12px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .profile-item i {
+            color: #2a5298;
+            margin-right: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #2a5298, #1e3c72);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, #17a2b8, #117a8b);
+        }
+    </style>
+</head>
+<body>
+
+<div class="profile-card">
+    <h2>My Profile</h2>
+
+    <p class="profile-item"><i class="fas fa-user"></i> <b>Name:</b> {{ profile.full_name }}</p>
+    <p class="profile-item"><i class="fas fa-id-badge"></i> <b>Employee ID:</b> {{ profile.employee_id }}</p>
+    <p class="profile-item"><i class="fas fa-building"></i> <b>Department:</b> {{ profile.department }}</p>
+    <p class="profile-item"><i class="fas fa-briefcase"></i> <b>Job Role:</b> {{ profile.job_role }}</p>
+    <p class="profile-item"><i class="fas fa-history"></i> <b>Experience:</b> {{ profile.work_experience }} years</p>
+
+    <a href="{% url 'emp_projects' %}" class="btn">Go to Projects →</a>
+</div>
+
+</body>
+</html>

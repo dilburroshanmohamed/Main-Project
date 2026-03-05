@@ -397,3 +397,58 @@ def view_stress_records(request):
 
     records = StressRecord.objects.select_related('user').order_by('-created_at')
     return render(request, 'view_stress_records.html', {'records': records})
+
+
+
+@login_required
+def emp_profile(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    return render(request, 'emp/emp_profile.html', {'profile': profile})
+
+@login_required
+def emp_projects(request):
+    allocations = ProjectAllocation.objects.filter(employee__user=request.user)
+    total_hours = sum(a.allocated_hours_per_week for a in allocations)
+    return render(request, 'emp/emp_projects.html', {
+        'allocations': allocations,
+        'total_allocated_hours': total_hours
+    })
+
+@login_required
+def emp_stress_form(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    score = status = recommendation = None
+
+    if request.method == 'POST':
+        workload = float(request.POST['workload_score'])
+        satisfaction = float(request.POST['job_satisfaction'])
+        sleep = float(request.POST['sleep_hours'])
+        activity = float(request.POST['physical_activity'])
+        caffeine = float(request.POST['caffeine'])
+        stress = float(request.POST['stress_level'])
+
+        score = (workload*2 + stress*2 - satisfaction + caffeine*0.5 - sleep + activity*0.5)
+        if score < 40:
+            status, recommendation = "High Risk", "Please consult HR or a counselor."
+        elif score < 70:
+            status, recommendation = "Medium Risk", "Maintain balance and monitor stress."
+        else:
+            status, recommendation = "Healthy", "Keep up your good habits."
+
+        StressRecord.objects.create(user=request.user, mental_health_score=score)
+
+    return render(request, 'emp/emp_stress_form.html', {
+        'profile': profile,
+        'score': score,
+        'status': status,
+        'recommendation': recommendation
+    })
+
+@login_required
+def emp_history(request):
+    records = StressRecord.objects.filter(user=request.user).order_by('-created_at')
+    avg_score = records.aggregate(Avg('mental_health_score'))['mental_health_score__avg']
+    return render(request, 'emp/emp_history.html', {
+        'records': records,
+        'personal_avg': avg_score
+    })
