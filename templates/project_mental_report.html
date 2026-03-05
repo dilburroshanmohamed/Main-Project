@@ -1,48 +1,86 @@
-<h2>Project Mental Health Report</h2>
-<a href="/pm-dashboard/">Back</a>
-<hr>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Employee Mental Health Records</title>
 
-{% for data in report_data %}
+<style>
 
-<h3>{{ data.project.project_name }}</h3>
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:30px;
+}
 
-<table border="1" width="100%" cellpadding="8">
-    <tr>
-        <th>Employee</th>
-        <th>Department</th>
-        <th>Mental Health Score</th>
-        <th>Status</th>
-    </tr>
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
 
-    {% for emp in data.employees %}
-    <tr>
-        <td>{{ emp.employee.full_name }}</td>
-        <td>{{ emp.employee.department }}</td>
-        <td>{{ emp.score|default:"No Data" }}</td>
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
 
-        <td>
-            {% if emp.score %}
-                {% if emp.score < 40 %}
-                    <span style="color:red;">High Risk</span>
-                {% elif emp.score < 70 %}
-                    <span style="color:orange;">Medium Risk</span>
-                {% else %}
-                    <span style="color:green;">Healthy</span>
-                {% endif %}
-            {% else %}
-                No Data
-            {% endif %}
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">No employees allocated.</td>
-    </tr>
-    {% endfor %}
-</table>
+th{
+background:#2a5298;
+color:white;
+}
 
-<hr>
+.btn{
+display:inline-block;
+margin-bottom:15px;
+padding:8px 12px;
+background:#2a5298;
+color:white;
+text-decoration:none;
+border-radius:5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Employee Mental Health Records</h2>
+
+<a href="/pm-dashboard/" class="btn">Back to Dashboard</a>
+
+<table>
+
+<tr>
+<th>Employee</th>
+<th>Mental Health Score</th>
+<th>Stress Level</th>
+<th>Date</th>
+</tr>
+
+{% for record in records %}
+
+<tr>
+
+<td>{{ record.user.username }}</td>
+
+<td>{{ record.mental_health_score|floatformat:2 }}</td>
+
+<td>{{ record.stress_level }}</td>
+
+<td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+
+</tr>
 
 {% empty %}
-<p>No projects found.</p>
+
+<tr>
+<td colspan="4">No records available</td>
+</tr>
+
 {% endfor %}
+
+</table>
+
+</body>
+</html>

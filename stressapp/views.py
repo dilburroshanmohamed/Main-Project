@@ -290,31 +290,28 @@ def project_detail(request, project_id):
 # 🔹 Project Mental Report (PM only)
 @login_required
 def project_mental_report(request):
+
     profile = EmployeeProfile.objects.filter(user=request.user).first()
+
     if not profile or profile.role != 'PM':
         return redirect('/')
 
+    # Get projects created by this PM
     projects = Project.objects.filter(created_by=request.user)
-    report_data = []
 
-    for project in projects:
-        allocations = ProjectAllocation.objects.filter(project=project)
-        employee_data = []
-        for allocation in allocations:
-            latest_record = StressRecord.objects.filter(
-                user=allocation.employee.user
-            ).order_by('-created_at').first()
-            score = latest_record.mental_health_score if latest_record else None
-            employee_data.append({
-                'employee': allocation.employee,
-                'score': score
-            })
-        report_data.append({
-            'project': project,
-            'employees': employee_data
-        })
+    # Get employees allocated to these projects
+    allocations = ProjectAllocation.objects.filter(project__in=projects)
 
-    return render(request, 'project_mental_report.html', {'report_data': report_data})
+    employees = [a.employee.user for a in allocations]
+
+    # Get stress records of those employees
+    records = StressRecord.objects.filter(user__in=employees).order_by('-created_at')
+
+    return render(request, 'project_mental_report.html', {
+        'records': records
+    })
+
+
 
 # 🔹 Logout
 def logout_view(request):
