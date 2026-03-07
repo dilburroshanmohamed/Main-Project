@@ -40,4 +40,8 @@ urlpatterns = [
     path('emp/projects/', views.emp_projects, name='emp_projects'),
     path('emp/stress/', views.emp_stress_form, name='emp_stress_form'),
     path('emp/history/', views.emp_history, name='emp_history'),
+
+
+    path('update-progress/<int:allocation_id>/', views.update_progress, name='update_progress'),
+
 ]

@@ -103,6 +103,7 @@
             <th>Employee</th>
             <th>Department</th>
             <th>Hours</th>
+            <th>Task</th>
         </tr>
 
         {% for allocation in data.allocations %}
@@ -110,10 +111,11 @@
             <td>{{ allocation.employee.full_name }}</td>
             <td>{{ allocation.employee.department }}</td>
             <td>{{ allocation.allocated_hours_per_week }}</td>
+            <td>{{ allocation.task_role }}</td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="3">No employees allocated yet.</td>
+            <td colspan="4">No employees allocated yet.</td>
         </tr>
         {% endfor %}
     </table>

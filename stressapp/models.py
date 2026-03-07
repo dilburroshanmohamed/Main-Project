@@ -41,11 +41,6 @@ class Project(models.Model):
 
 class ProjectAllocation(models.Model):
 
-    employee = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    allocated_hours_per_week = models.FloatField()
-    allocated_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    allocated_date = models.DateTimeField(auto_now_add=True)
 
     TASK_CHOICES = [
         ('UI/UX', 'UI/UX'),
@@ -54,6 +49,16 @@ class ProjectAllocation(models.Model):
         ('Requirement Gathering', 'Requirement Gathering'),
         ('Testing', 'Testing'),
     ]
+
+    employee = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    allocated_hours_per_week = models.FloatField()
+    task_role = models.CharField(max_length=50, choices=TASK_CHOICES)
+    progress = models.IntegerField(default=0)
+    allocated_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    allocated_date = models.DateTimeField(auto_now_add=True)
+
+    
 
 
 

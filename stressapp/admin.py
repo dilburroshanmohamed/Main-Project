@@ -11,10 +11,22 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = ('project_name', 'created_by')
 
 
+from django.contrib import admin
+from .models import ProjectAllocation
+
+
 @admin.register(ProjectAllocation)
 class ProjectAllocationAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'project', 'allocated_hours_per_week')
 
+    list_display = (
+        'employee',
+        'project',
+        'task_role',
+        'allocated_hours_per_week',
+        'progress',
+        'allocated_by',
+        'allocated_date'
+    )
 
 @admin.register(StressRecord)
 class StressRecordAdmin(admin.ModelAdmin):

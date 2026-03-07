@@ -71,23 +71,49 @@ def admin_dashboard(request):
 # 🔹 PM Dashboard
 @login_required
 def pm_dashboard(request):
+
     profile = EmployeeProfile.objects.filter(user=request.user).first()
+
     if not profile or profile.role != 'PM':
         if request.user.is_superuser:
             return redirect('/admin-dashboard/')
         return redirect('/')
 
     projects = Project.objects.filter(created_by=request.user)
+
     project_data = []
+
     for project in projects:
+
         allocations = ProjectAllocation.objects.filter(project=project)
+
+        # ⭐ NEW: calculate project progress
+        total_progress = 0
+        count = allocations.count()
+
+        for alloc in allocations:
+            total_progress += alloc.progress
+
+        project_progress = 0
+        if count > 0:
+            project_progress = total_progress / count
+
+        # ⭐ keep all old data + add progress
         project_data.append({
             'project': project,
             'allocations': allocations,
-            'allocated_count': allocations.count()
+            'employee_count': count,
+            'total_hours': sum(alloc.allocated_hours_per_week for alloc in allocations),
+            'progress': project_progress
         })
 
-    return render(request, 'pm_dashboard.html', {'project_data': project_data})
+    return render(request, 'pm_dashboard.html', {
+        'project_data': project_data
+    })
+
+
+
+
 
 # 🔹 PM Profile
 @login_required
@@ -228,11 +254,13 @@ def allocate_employee(request):
             for emp_id in selected_employees:
                 employee = EmployeeProfile.objects.get(id=emp_id)
                 hours = request.POST.get(f'hours_{emp_id}')
+                task = request.POST.get(f'task_{emp_id}')
                 if hours:
                     ProjectAllocation.objects.create(
                         employee=employee,
                         project=project,
                         allocated_hours_per_week=hours,
+                        task_role=task,
                         allocated_by=request.user
                     )
             return redirect('/project-allocations/')
@@ -452,3 +480,21 @@ def emp_history(request):
         'records': records,
         'personal_avg': avg_score
     })
+
+
+
+
+@login_required
+def update_progress(request, allocation_id):
+
+    allocation = ProjectAllocation.objects.get(id=allocation_id)
+
+    if request.method == "POST":
+
+        progress = request.POST.get('progress')
+
+        if progress:
+            allocation.progress = int(progress)
+            allocation.save()
+
+    return redirect('/emp/projects/')

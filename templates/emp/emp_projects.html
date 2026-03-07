@@ -94,17 +94,67 @@
 <div class="projects-card">
     <h2><i class="fas fa-briefcase"></i> Assigned Projects</h2>
 
-    <table>
-        <tr><th>Project</th><th>Hours</th></tr>
-        {% for allocation in allocations %}
-        <tr>
-            <td>{{ allocation.project.project_name }}</td>
-            <td>{{ allocation.allocated_hours_per_week }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="2">No projects allocated.</td></tr>
-        {% endfor %}
-    </table>
+   <h2>Assigned Projects</h2>
+
+<table border="1">
+
+<tr>
+<th>Project</th>
+<th>Task</th>
+<th>Hours</th>
+<th>Progress</th>
+<th>Status</th>
+<th>Update</th>
+</tr>
+
+{% for allocation in allocations %}
+
+<tr>
+
+<td>{{ allocation.project.project_name }}</td>
+
+<td>{{ allocation.task_role }}</td>
+
+<td>{{ allocation.allocated_hours_per_week }}</td>
+
+<td>{{ allocation.progress }}%</td>
+
+<td>
+{% if allocation.progress == 100 %}
+Completed
+{% else %}
+In Progress
+{% endif %}
+</td>
+
+<td>
+
+<form method="post" action="{% url 'update_progress' allocation.id %}">
+{% csrf_token %}
+
+<input type="number"
+name="progress"
+min="0"
+max="100"
+value="{{ allocation.progress }}">
+
+<button type="submit">Update</button>
+
+</form>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="6">No projects allocated.</td>
+</tr>
+
+{% endfor %}
+
+</table>
 
     <p class="total-hours"><i class="fas fa-clock"></i> Total Weekly Hours: {{ total_allocated_hours }}</p>
 

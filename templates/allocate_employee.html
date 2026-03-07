@@ -70,35 +70,26 @@ color:red;
 {% endif %}
 
 <form method="post">
-
 {% csrf_token %}
 
 <label>Select Project</label>
-
 <select name="project" required>
-
-<option value="">Select Project</option>
-
-{% for project in projects %}
-<option value="{{ project.id }}">{{ project.project_name }}</option>
-{% endfor %}
-
+    {% for project in projects %}
+    <option value="{{ project.id }}">{{ project.project_name }}</option>
+    {% endfor %}
 </select>
 
 <br><br>
 
-<h3>Employee Allocation</h3>
-
-<table>
-
+<table border="1" width="100%">
 <tr>
-<th>Select</th>
-<th>Employee</th>
-<th>Hours / Week</th>
+    <th>Select</th>
+    <th>Employee</th>
+    <th>Allocated Hours</th>
+    <th>Task</th>
 </tr>
 
 {% for emp in employees %}
-
 <tr>
 
 <td>
@@ -110,15 +101,20 @@ color:red;
 </td>
 
 <td>
-<input type="number"
-name="hours_{{ emp.id }}"
-min="1"
-max="60"
-placeholder="Hours">
+<input type="number" name="hours_{{ emp.id }}" placeholder="Hours">
+</td>
+
+<td>
+<select name="task_{{ emp.id }}">
+<option value="UIUX">UI/UX</option>
+<option value="DB">Database Design</option>
+<option value="BACKEND">Backend Developer</option>
+<option value="REQ">Requirement Gathering</option>
+<option value="TEST">Testing</option>
+</select>
 </td>
 
 </tr>
-
 {% endfor %}
 
 </table>
@@ -128,7 +124,6 @@ placeholder="Hours">
 <button type="submit">Allocate Employees</button>
 
 </form>
-
 </div>
 
 </body>
