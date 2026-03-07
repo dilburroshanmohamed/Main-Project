@@ -47,6 +47,16 @@ class ProjectAllocation(models.Model):
     allocated_by = models.ForeignKey(User, on_delete=models.CASCADE)
     allocated_date = models.DateTimeField(auto_now_add=True)
 
+    TASK_CHOICES = [
+        ('UI/UX', 'UI/UX'),
+        ('Database Design', 'Database Design'),
+        ('Backend Developer', 'Backend Developer'),
+        ('Requirement Gathering', 'Requirement Gathering'),
+        ('Testing', 'Testing'),
+    ]
+
+
+
     def __str__(self):
         return f"{self.employee.full_name} - {self.project.project_name}"
 
