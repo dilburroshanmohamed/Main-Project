@@ -43,5 +43,6 @@ urlpatterns = [
 
 
     path('update-progress/<int:allocation_id>/', views.update_progress, name='update_progress'),
+    path('project-progress/', views.project_progress, name='project_progress'),
 
 ]

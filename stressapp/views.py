@@ -107,7 +107,7 @@ def pm_dashboard(request):
             'progress': project_progress
         })
 
-    return render(request, 'pm_dashboard.html', {
+    return render(request, 'pm/pm_dashboard.html', {
         'project_data': project_data
     })
 
@@ -121,7 +121,7 @@ def pm_profile(request):
     profile = EmployeeProfile.objects.filter(user=request.user).first()
     if not profile or profile.role != 'PM':
         return redirect('/')
-    return render(request, 'pm_profile.html', {'profile': profile})
+    return render(request, 'pm/pm_profile.html', {'profile': profile})
 
 # 🔹 Add Employee
 @login_required
@@ -233,7 +233,7 @@ def create_project(request):
             created_by=request.user
         )
         return redirect('/pm-dashboard/')
-    return render(request, 'create_project.html')
+    return render(request, 'pm/create_project.html')
 
 @login_required
 def allocate_employee(request):
@@ -264,7 +264,7 @@ def allocate_employee(request):
                         allocated_by=request.user
                     )
             return redirect('/project-allocations/')
-    return render(request, 'allocate_employee.html', {
+    return render(request, 'pm/allocate_employee.html', {
         'employees': employees,
         'projects': projects,
         'error': error
@@ -291,7 +291,7 @@ def project_allocations(request):
             'total_hours': total_hours,
             'employee_count': allocations.count()
         })
-    return render(request, 'project_allocations.html', {'project_data': project_data})
+    return render(request, 'pm/project_allocations.html', {'project_data': project_data})
 
 # 🔹 Project Detail
 @login_required
@@ -308,7 +308,7 @@ def project_detail(request, project_id):
     allocations = ProjectAllocation.objects.filter(project=project)
     total_hours = sum(a.allocated_hours_per_week for a in allocations)
 
-    return render(request, 'project_detail.html', {
+    return render(request, 'pm/project_detail.html', {
         'project': project,
         'allocations': allocations,
         'total_hours': total_hours,
@@ -335,7 +335,7 @@ def project_mental_report(request):
     # Get stress records of those employees
     records = StressRecord.objects.filter(user__in=employees).order_by('-created_at')
 
-    return render(request, 'project_mental_report.html', {
+    return render(request, 'pm/project_mental_report.html', {
         'records': records
     })
 
@@ -498,3 +498,41 @@ def update_progress(request, allocation_id):
             allocation.save()
 
     return redirect('/emp/projects/')
+
+
+
+@login_required
+def project_progress(request):
+
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+
+    if not profile or profile.role != 'PM':
+        return redirect('/')
+
+    projects = Project.objects.filter(created_by=request.user)
+
+    project_data = []
+
+    for project in projects:
+
+        allocations = ProjectAllocation.objects.filter(project=project)
+
+        total_progress = 0
+        count = allocations.count()
+
+        if count > 0:
+            for alloc in allocations:
+                total_progress += alloc.progress
+            avg_progress = total_progress / count
+        else:
+            avg_progress = 0
+
+        project_data.append({
+            'project': project,
+            'allocations': allocations,
+            'progress': avg_progress
+        })
+
+    return render(request, 'pm/project_progress.html', {
+        'project_data': project_data
+    })
