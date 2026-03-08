@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Project Progress</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f6f9;
+padding:40px;
+}
+
+.box{
+background:white;
+padding:20px;
+border-radius:8px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#2a5298;
+color:white;
+}
+
+.progress-bar{
+width:100%;
+background:#ddd;
+height:20px;
+border-radius:5px;
+}
+
+.progress-fill{
+background:#28a745;
+height:20px;
+border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>My Project Progress</h2>
+
+<table>
+
+<tr>
+<th>Project</th>
+<th>My Task</th>
+<th>My Progress</th>
+<th>Project Progress</th>
+</tr>
+
+{% for data in project_data %}
+
+<tr>
+
+<td>{{ data.project.project_name }}</td>
+
+<td>{{ data.task_role }}</td>
+
+<td>{{ data.my_progress }}%</td>
+
+<td>
+
+<div class="progress-bar">
+
+<div class="progress-fill"
+style="width: {{ data.project_progress|default:0 }}%;">
+</div>
+
+</div>
+
+{{ data.project_progress|floatformat:0 }}%
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4">No project assigned</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/employee-dashboard/">Back to Dashboard</a>
+
+</div>
+
+</body>
+</html>

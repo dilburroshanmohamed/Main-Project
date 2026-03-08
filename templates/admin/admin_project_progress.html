@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Project Progress</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f6f9;
+padding:40px;
+}
+
+.project-box{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:8px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#2a5298;
+color:white;
+}
+
+.progress-bar{
+width:100%;
+background:#ddd;
+height:20px;
+border-radius:5px;
+}
+
+.progress-fill{
+background:#28a745;
+height:20px;
+border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>All Project Progress</h2>
+
+{% for data in project_data %}
+
+<div class="project-box">
+
+<h3>{{ data.project.project_name }}</h3>
+<p><b>Project Manager:</b> {{ data.project.created_by.username }}</p>
+
+<p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
+
+<div class="progress-bar">
+<div class="progress-fill"
+style="width: {{ data.progress|default:0 }}%;">
+</div>
+</div>
+
+<br>
+
+<table>
+
+<tr>
+<th>Employee</th>
+<th>Task</th>
+<th>Progress</th>
+</tr>
+
+{% for alloc in data.allocations %}
+
+<tr>
+<td>{{ alloc.employee.full_name }}</td>
+<td>{{ alloc.task_role }}</td>
+<td>{{ alloc.progress }}%</td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="3">No allocations yet</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% endfor %}
+
+<br>
+
+<a href="/admin-dashboard/">Back to Dashboard</a>
+
+</body>
+</html>

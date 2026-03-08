@@ -536,3 +536,90 @@ def project_progress(request):
     return render(request, 'pm/project_progress.html', {
         'project_data': project_data
     })
+
+
+
+
+
+
+
+
+
+@login_required
+def admin_project_progress(request):
+
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    projects = Project.objects.all()
+
+    project_data = []
+
+    for project in projects:
+
+        allocations = ProjectAllocation.objects.filter(project=project)
+
+        total_progress = 0
+        count = allocations.count()
+
+        if count > 0:
+            for alloc in allocations:
+                total_progress += alloc.progress
+
+            avg_progress = total_progress / count
+        else:
+            avg_progress = 0
+
+        project_data.append({
+            'project': project,
+            'allocations': allocations,
+            'progress': avg_progress
+        })
+
+    return render(request, 'admin/admin_project_progress.html', {
+        'project_data': project_data
+    })
+
+
+
+
+
+@login_required
+def emp_project_progress(request):
+
+    profile = EmployeeProfile.objects.filter(user=request.user).first()
+
+    if not profile or profile.role != 'EMP':
+        return redirect('/')
+
+    allocations = ProjectAllocation.objects.filter(employee=profile)
+
+    project_data = []
+
+    for alloc in allocations:
+
+        project = alloc.project
+
+        all_allocations = ProjectAllocation.objects.filter(project=project)
+
+        total_progress = 0
+        count = all_allocations.count()
+
+        if count > 0:
+            for a in all_allocations:
+                total_progress += a.progress
+
+            avg_progress = total_progress / count
+        else:
+            avg_progress = 0
+
+        project_data.append({
+            'project': project,
+            'task_role': alloc.task_role,
+            'my_progress': alloc.progress,
+            'project_progress': avg_progress
+        })
+
+    return render(request, 'emp/emp_project_progress.html', {
+        'project_data': project_data
+    })
