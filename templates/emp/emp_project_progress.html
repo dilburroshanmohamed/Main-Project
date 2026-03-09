@@ -80,8 +80,11 @@ border-radius:5px;
 <div class="progress-bar">
 
 <div class="progress-fill"
-style="width: {{ data.project_progress|default:0 }}%;">
+     style="width: {{ data.project_progress|default:'0' }}%;">
 </div>
+
+
+
 
 </div>
 

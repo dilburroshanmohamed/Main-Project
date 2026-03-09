@@ -66,10 +66,12 @@ border-radius:5px;
 <p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
 
 <div class="progress-bar">
-<div class="progress-fill"
-style="width: {{ data.progress|default:0 }}%;">
+    <div class="progress-fill"
+         style="width: {{ data.progress|default:'0' }}%;">
+    </div>
 </div>
-</div>
+
+
 
 <br>
 
