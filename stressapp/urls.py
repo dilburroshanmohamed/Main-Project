@@ -48,8 +48,20 @@ urlpatterns = [
 
 
 
-     path('admin-project-progress/', views.admin_project_progress, name='admin_project_progress'),
+    path('admin-project-progress/', views.admin_project_progress, name='admin_project_progress'),
     path('project-progress/', views.project_progress, name='project_progress'),
    
     path('emp/project-progress/', views.emp_project_progress, name='emp_project_progress'),
+
+
+    
+
+    path('edit-employee/<int:emp_id>/', views.edit_employee, name='edit_employee'),
+    path('delete-employee/<int:emp_id>/', views.delete_employee, name='delete_employee'),
+
+
+    path('edit-pm/<int:pm_id>/', views.edit_pm, name='edit_pm'),
+    path('delete-pm/<int:pm_id>/', views.delete_pm, name='delete_pm'),
+
+
 ]

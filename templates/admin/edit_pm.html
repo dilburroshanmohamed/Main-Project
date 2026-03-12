@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Project Manager</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:40px;
+}
+
+.box{
+background:white;
+width:420px;
+margin:auto;
+padding:30px;
+border-radius:8px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#2a5298;
+color:white;
+border:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Edit Project Manager</h2>
+
+<form method="POST">
+{% csrf_token %}
+
+<input type="text" name="full_name" value="{{ pm.full_name }}">
+
+<input type="text" name="department" value="{{ pm.department }}">
+
+<input type="text" name="job_role" value="{{ pm.job_role }}">
+
+<input type="number" name="experience" value="{{ pm.work_experience }}">
+
+<button type="submit">Update</button>
+
+</form>
+
+<br>
+
+<a href="{% url 'view_project_managers' %}">Back</a>
+
+</div>
+
+</body>
+</html>

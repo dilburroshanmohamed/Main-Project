@@ -623,3 +623,81 @@ def emp_project_progress(request):
     return render(request, 'emp/emp_project_progress.html', {
         'project_data': project_data
     })
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+
+@login_required
+def edit_employee(request, emp_id):
+
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    employee = get_object_or_404(EmployeeProfile, id=emp_id)
+
+    if request.method == 'POST':
+        employee.full_name = request.POST.get('full_name')
+        employee.department = request.POST.get('department')
+        employee.job_role = request.POST.get('job_role')
+        employee.work_experience = request.POST.get('experience')
+
+        employee.save()
+
+        return redirect('view_employees')
+
+    return render(request, 'admin/edit_emp.html', {'employee': employee})
+
+
+
+
+
+@login_required
+def delete_employee(request, emp_id):
+
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    employee = get_object_or_404(EmployeeProfile, id=emp_id)
+
+    # delete employee profile
+    employee.delete()
+
+    return redirect('view_employees')
+
+
+
+@login_required
+def edit_pm(request, pm_id):
+
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    pm = get_object_or_404(EmployeeProfile, id=pm_id)
+
+    if request.method == 'POST':
+        pm.full_name = request.POST.get('full_name')
+        pm.department = request.POST.get('department')
+        pm.job_role = request.POST.get('job_role')
+        pm.work_experience = request.POST.get('experience')
+
+        pm.save()
+
+        return redirect('view_project_managers')
+
+    return render(request, 'admin/edit_pm.html', {'pm': pm})
+
+
+
+
+@login_required
+def delete_pm(request, pm_id):
+
+    if not request.user.is_superuser:
+        return redirect('/')
+
+    pm = get_object_or_404(EmployeeProfile, id=pm_id)
+
+    # delete user + profile
+    pm.user.delete()
+
+    return redirect('view_project_managers')

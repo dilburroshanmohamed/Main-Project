@@ -203,7 +203,7 @@
                 <td>{{ emp.department }}</td>
                 <td>{{ emp.job_role }}</td>
                 <td>{{ emp.work_experience }}</td>
-                <td><a href="/edit-employee/{{ emp.id }}/">Edit</a></td>
+                <td><a href="{% url 'view_employees' %}">Edit</a></td>
             </tr>
             {% empty %}
             <tr><td colspan="6">No employees registered.</td></tr>

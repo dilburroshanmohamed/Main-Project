@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Employee</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:40px;
+}
+
+.box{
+background:white;
+width:420px;
+margin:auto;
+padding:30px;
+border-radius:8px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+input{
+width:100%;
+padding:10px;
+margin-bottom:12px;
+border:1px solid #ccc;
+border-radius:4px;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#2a5298;
+color:white;
+border:none;
+border-radius:4px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1e3c72;
+}
+
+.back{
+display:block;
+margin-top:10px;
+text-align:center;
+text-decoration:none;
+color:#2a5298;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Edit Employee</h2>
+<a href="/admin-dashboard/">Back to Dashboard</a>
+
+
+<form method="POST">
+{% csrf_token %}
+
+<label>Full Name</label>
+<input type="text" name="full_name" value="{{ employee.full_name }}" required>
+
+<label>Department</label>
+<input type="text" name="department" value="{{ employee.department }}" required>
+
+<label>Job Role</label>
+<input type="text" name="job_role" value="{{ employee.job_role }}" required>
+
+<label>Experience (Years)</label>
+<input type="number" name="experience" value="{{ employee.work_experience }}" required>
+
+<button type="submit">Update Employee</button>
+
+</form>
+
+<a class="back" href="{% url 'view_employees' %}">Back to Employees</a>
+
+</div>
+
+</body>
+</html>
