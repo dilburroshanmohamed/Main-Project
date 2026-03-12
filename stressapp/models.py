@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User as AuthUser
 from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
@@ -6,6 +7,12 @@ ROLE_CHOICES = (
     ('PM', 'Project Manager'),
     ('EMP', 'Employee'),
 )
+
+
+
+
+
+
 
 class EmployeeProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
