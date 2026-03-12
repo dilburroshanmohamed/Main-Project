@@ -109,6 +109,9 @@ showSection("pending");
 
 </head>
 
+<a class="back-btn" href="/admin-dashboard/">Back to Dashboard</a>
+
+
 <body>
 
 <h2>All Project Progress</h2>
@@ -121,13 +124,12 @@ showSection("pending");
 
 <div id="pending" class="section">
 
-<h3>Pending Projects</h3>
 
 {% for data in pending_projects %}
 
 <div class="project-box">
 
-<h3>{{ data.project.project_name }}</h3>
+<h2>{{ data.project.project_name }}</h2>
 
 <p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
 
@@ -176,13 +178,12 @@ showSection("pending");
 
 <div id="progress" class="section">
 
-<h3>In Progress Projects</h3>
 
 {% for data in processing_projects %}
 
 <div class="project-box">
 
-<h3>{{ data.project.project_name }}</h3>
+<h2>{{ data.project.project_name }}</h2>
 
 <p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
 
@@ -225,13 +226,12 @@ showSection("pending");
 
 <div id="completed" class="section">
 
-<h3>Completed Projects</h3>
 
 {% for data in completed_projects %}
 
 <div class="project-box">
 
-<h3>{{ data.project.project_name }}</h3>
+<h2>{{ data.project.project_name }}</h2>
 
 <p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
 
@@ -270,7 +270,6 @@ showSection("pending");
 </div>
 
 
-<a class="back-btn" href="/admin-dashboard/">Back to Dashboard</a>
 
 </body>
 </html>

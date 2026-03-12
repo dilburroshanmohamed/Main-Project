@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<title>Project Progress</title>
+<title>Employee Mental Health Records</title>
 
 <style>
 
 body{
-font-family: Arial;
+font-family: Arial, sans-serif;
 background:#f4f6f9;
+margin:0;
 padding:40px;
 }
 
-button{
-padding:10px 20px;
-margin-right:10px;
-border:none;
-background:#2a5298;
-color:white;
-cursor:pointer;
+.container{
+background:white;
+padding:30px;
+border-radius:8px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-.section{
-display:none;
-margin-top:20px;
+/* Title */
+
+h2{
+color:#2a5298;
+margin-bottom:20px;
 }
+
+/* Table */
 
 table{
 width:100%;
@@ -33,7 +35,7 @@ margin-top:10px;
 }
 
 th,td{
-padding:10px;
+padding:12px;
 border:1px solid #ddd;
 text-align:center;
 }
@@ -43,134 +45,104 @@ background:#2a5298;
 color:white;
 }
 
-</style>
-
-<script>
-
-function showSection(section){
-
-document.getElementById("pending").style.display="none";
-document.getElementById("progress").style.display="none";
-document.getElementById("completed").style.display="none";
-
-document.getElementById(section).style.display="block";
-
+tr:nth-child(even){
+background:#f9f9f9;
 }
 
-</script>
+tr:hover{
+background:#eef3ff;
+}
 
+/* Status Colors */
+
+.high{
+color:#c62828;
+font-weight:bold;
+}
+
+.medium{
+color:#ef6c00;
+font-weight:bold;
+}
+
+.low{
+color:#2e7d32;
+font-weight:bold;
+}
+
+/* Back Button */
+
+.back-btn{
+display:inline-block;
+margin-top:20px;
+padding:10px 20px;
+background:#2a5298;
+color:white;
+text-decoration:none;
+border-radius:6px;
+}
+
+.back-btn:hover{
+background:#1e3c72;
+}
+
+</style>
 </head>
 
 <body>
 
-<h2>Project Progress</h2>
+<div class="container">
 
-<button onclick="showSection('pending')">Pending</button>
-<button onclick="showSection('progress')">In Progress</button>
-<button onclick="showSection('completed')">Completed</button>
-
-
-<!-- Pending Projects -->
-
-<div id="pending" class="section" style="display:block;">
-    
-<h3>Pending Projects</h3>
+<h2>Employee Mental Health Records</h2>
 
 <table>
 
 <tr>
-<th>Project</th>
-<th>Project Manager</th>
-<th>Progress</th>
+<th>Employee</th>
+<th>Mental Health Score</th>
+<th>Stress Level</th>
+<th>Date</th>
 </tr>
 
-{% for p in pending_projects %}
+{% for record in records %}
 
 <tr>
-<td>{{ p.project.project_name }}</td>
-<td>{{ p.project.created_by.username }}</td>
-<td>{{ p.progress }}%</td>
+
+<td>{{ record.user.username }}</td>
+
+<td>{{ record.mental_health_score|floatformat:2 }}</td>
+
+<td>
+
+{% if record.mental_health_score < 40 %}
+<span class="high">High Risk</span>
+
+{% elif record.mental_health_score < 70 %}
+<span class="medium">Medium Risk</span>
+
+{% else %}
+<span class="low">Healthy</span>
+{% endif %}
+
+</td>
+
+<td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+
 </tr>
 
 {% empty %}
 
 <tr>
-<td colspan="3">No pending projects</td>
+<td colspan="4">No stress records available</td>
 </tr>
 
 {% endfor %}
 
 </table>
 
-</div>
+<br>
 
-
-<!-- In Progress -->
-
-<div id="progress" class="section">
-
-<h3>In Progress Projects</h3>
-
-<table>
-
-<tr>
-<th>Project</th>
-<th>Project Manager</th>
-<th>Progress</th>
-</tr>
-
-{% for p in processing_projects %}
-
-<tr>
-<td>{{ p.project.project_name }}</td>
-<td>{{ p.project.created_by.username }}</td>
-<td>{{ p.progress }}%</td>
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="3">No projects in progress</td>
-</tr>
-
-{% endfor %}
-
-</table>
-
-</div>
-
-
-<!-- Completed -->
-
-<div id="completed" class="section">
-
-<h3>Completed Projects</h3>
-
-<table>
-
-<tr>
-<th>Project</th>
-<th>Project Manager</th>
-<th>Progress</th>
-</tr>
-
-{% for p in completed_projects %}
-
-<tr>
-<td>{{ p.project.project_name }}</td>
-<td>{{ p.project.created_by.username }}</td>
-<td>{{ p.progress }}%</td>
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="3">No completed projects</td>
-</tr>
-
-{% endfor %}
-
-</table>
+<a class="back-btn" href="/admin-dashboard/">Back to Dashboard</a>
 
 </div>
 
