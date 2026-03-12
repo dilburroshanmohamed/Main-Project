@@ -49,8 +49,7 @@ urlpatterns = [
 
 
     path('admin-project-progress/', views.admin_project_progress, name='admin_project_progress'),
-    path('project-progress/', views.project_progress, name='project_progress'),
-   
+    path('pm/project-progress/', views.pm_project_progress, name='pm_project_progress'),   
     path('emp/project-progress/', views.emp_project_progress, name='emp_project_progress'),
 
 

@@ -501,12 +501,17 @@ def update_progress(request, allocation_id):
 
 
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
+from .models import Project, ProjectAllocation, EmployeeProfile
+
+
 @login_required
-def project_progress(request):
+def pm_project_progress(request):
 
     profile = EmployeeProfile.objects.filter(user=request.user).first()
 
-    if not profile or profile.role != 'PM':
+    if not profile or profile.role != "PM":
         return redirect('/')
 
     projects = Project.objects.filter(created_by=request.user)
@@ -517,15 +522,7 @@ def project_progress(request):
 
         allocations = ProjectAllocation.objects.filter(project=project)
 
-        total_progress = 0
-        count = allocations.count()
-
-        if count > 0:
-            for alloc in allocations:
-                total_progress += alloc.progress
-            avg_progress = total_progress / count
-        else:
-            avg_progress = 0
+        avg_progress = allocations.aggregate(avg=Avg('progress'))['avg'] or 0
 
         project_data.append({
             'project': project,
