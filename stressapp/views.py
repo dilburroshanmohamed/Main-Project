@@ -583,48 +583,72 @@ def admin_project_progress(request):
     })
 
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
+from .models import EmployeeProfile, ProjectAllocation
+
+
 @login_required
 def emp_project_progress(request):
 
     profile = EmployeeProfile.objects.filter(user=request.user).first()
 
-    if not profile or profile.role != 'EMP':
+    if not profile or profile.role != "EMP":
         return redirect('/')
 
     allocations = ProjectAllocation.objects.filter(employee=profile)
 
-    project_data = []
+    projects = {}
 
     for alloc in allocations:
 
         project = alloc.project
 
-        all_allocations = ProjectAllocation.objects.filter(project=project)
+        if project not in projects:
 
-        total_progress = 0
-        count = all_allocations.count()
+            all_alloc = ProjectAllocation.objects.filter(project=project)
 
-        if count > 0:
-            for a in all_allocations:
+            total_progress = 0
+            count = all_alloc.count()
+
+            for a in all_alloc:
                 total_progress += a.progress
 
-            avg_progress = total_progress / count
-        else:
-            avg_progress = 0
+            avg_progress = total_progress / count if count > 0 else 0
 
-        project_data.append({
-            'project': project,
-            'task_role': alloc.task_role,
-            'my_progress': alloc.progress,
-            'project_progress': avg_progress
-        })
+            project_data = {
+                'project': project,
+                'allocations': all_alloc,
+                'progress': avg_progress
+            }
+
+            projects[project] = project_data
+
+    pending_projects = []
+    processing_projects = []
+    completed_projects = []
+
+    for data in projects.values():
+
+        if data['progress'] == 0:
+            pending_projects.append(data)
+
+        elif data['progress'] < 100:
+            processing_projects.append(data)
+
+        else:
+            completed_projects.append(data)
 
     return render(request, 'emp/emp_project_progress.html', {
-        'project_data': project_data
+        'pending_projects': pending_projects,
+        'processing_projects': processing_projects,
+        'completed_projects': completed_projects
     })
 
 
-from django.shortcuts import render, get_object_or_404, redirect
+
+
+
 
 @login_required
 def edit_employee(request, emp_id):
