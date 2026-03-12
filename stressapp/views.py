@@ -544,44 +544,46 @@ def project_progress(request):
 
 
 
+from django.db.models import Avg
+from django.contrib.auth.decorators import login_required
+from .models import Project, ProjectAllocation
 
 @login_required
 def admin_project_progress(request):
 
-    if not request.user.is_superuser:
-        return redirect('/')
-
     projects = Project.objects.all()
 
-    project_data = []
+    pending_projects = []
+    processing_projects = []
+    completed_projects = []
 
     for project in projects:
 
         allocations = ProjectAllocation.objects.filter(project=project)
 
-        total_progress = 0
-        count = allocations.count()
+        # calculate overall progress
+        avg_progress = allocations.aggregate(avg=Avg('progress'))['avg'] or 0
 
-        if count > 0:
-            for alloc in allocations:
-                total_progress += alloc.progress
-
-            avg_progress = total_progress / count
-        else:
-            avg_progress = 0
-
-        project_data.append({
+        project_data = {
             'project': project,
             'allocations': allocations,
-            'progress': avg_progress
-        })
+            'progress': round(avg_progress,2)
+        }
 
-    return render(request, 'admin/admin_project_progress.html', {
-        'project_data': project_data
+        if avg_progress == 0:
+            pending_projects.append(project_data)
+
+        elif avg_progress < 100:
+            processing_projects.append(project_data)
+
+        else:
+            completed_projects.append(project_data)
+
+    return render(request,'admin/admin_project_progress.html',{
+        'pending_projects': pending_projects,
+        'processing_projects': processing_projects,
+        'completed_projects': completed_projects
     })
-
-
-
 
 
 @login_required

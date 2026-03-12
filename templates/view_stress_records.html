@@ -1,25 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Stress Records</title>
+
+<title>Project Progress</title>
 
 <style>
 
 body{
-font-family:Arial;
+font-family: Arial;
 background:#f4f6f9;
 padding:40px;
+}
+
+button{
+padding:10px 20px;
+margin-right:10px;
+border:none;
+background:#2a5298;
+color:white;
+cursor:pointer;
+}
+
+.section{
+display:none;
+margin-top:20px;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
-background:white;
+margin-top:10px;
 }
 
 th,td{
 padding:10px;
-border:1px solid #ccc;
+border:1px solid #ddd;
 text-align:center;
 }
 
@@ -28,53 +43,136 @@ background:#2a5298;
 color:white;
 }
 
-.btn{
-padding:8px 15px;
-background:#2a5298;
-color:white;
-text-decoration:none;
-border-radius:4px;
+</style>
+
+<script>
+
+function showSection(section){
+
+document.getElementById("pending").style.display="none";
+document.getElementById("progress").style.display="none";
+document.getElementById("completed").style.display="none";
+
+document.getElementById(section).style.display="block";
+
 }
 
-</style>
+</script>
 
 </head>
 
 <body>
 
-<h2>Employee Mental Health Records</h2>
+<h2>Project Progress</h2>
 
-<a href="/admin-dashboard/" class="btn">Back to Dashboard</a>
+<button onclick="showSection('pending')">Pending</button>
+<button onclick="showSection('progress')">In Progress</button>
+<button onclick="showSection('completed')">Completed</button>
 
-<br><br>
+
+<!-- Pending Projects -->
+
+<div id="pending" class="section" style="display:block;">
+    
+<h3>Pending Projects</h3>
 
 <table>
 
 <tr>
-<th>Employee</th>
-<th>Mental Health Score</th>
-<th>Stress Level</th>
-<th>Date</th>
+<th>Project</th>
+<th>Project Manager</th>
+<th>Progress</th>
 </tr>
 
-{% for record in records %}
+{% for p in pending_projects %}
 
 <tr>
-<td>{{ record.user.username }}</td>
-<td>{{ record.mental_health_score|floatformat:2 }}</td>
-<td>{{ record.stress_level }}</td>
-<td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+<td>{{ p.project.project_name }}</td>
+<td>{{ p.project.created_by.username }}</td>
+<td>{{ p.progress }}%</td>
 </tr>
 
 {% empty %}
 
 <tr>
-<td colspan="4">No records available</td>
+<td colspan="3">No pending projects</td>
 </tr>
 
 {% endfor %}
 
 </table>
+
+</div>
+
+
+<!-- In Progress -->
+
+<div id="progress" class="section">
+
+<h3>In Progress Projects</h3>
+
+<table>
+
+<tr>
+<th>Project</th>
+<th>Project Manager</th>
+<th>Progress</th>
+</tr>
+
+{% for p in processing_projects %}
+
+<tr>
+<td>{{ p.project.project_name }}</td>
+<td>{{ p.project.created_by.username }}</td>
+<td>{{ p.progress }}%</td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="3">No projects in progress</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+
+<!-- Completed -->
+
+<div id="completed" class="section">
+
+<h3>Completed Projects</h3>
+
+<table>
+
+<tr>
+<th>Project</th>
+<th>Project Manager</th>
+<th>Progress</th>
+</tr>
+
+{% for p in completed_projects %}
+
+<tr>
+<td>{{ p.project.project_name }}</td>
+<td>{{ p.project.created_by.username }}</td>
+<td>{{ p.progress }}%</td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="3">No completed projects</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
 
 </body>
 </html>

@@ -11,12 +11,36 @@ background:#f4f6f9;
 padding:40px;
 }
 
-.project-box{
+button{
+padding:10px 20px;
+margin-right:10px;
+border:none;
+border-radius:5px;
+background:#2a5298;
+color:white;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:#1e3c72;
+}
+
+.section{
+display:none;
 background:white;
 padding:20px;
-margin-bottom:20px;
+margin-top:20px;
 border-radius:8px;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.project-box{
+background:#fff;
+padding:15px;
+margin-bottom:20px;
+border-radius:6px;
+border:1px solid #ddd;
 }
 
 table{
@@ -39,47 +63,85 @@ color:white;
 .progress-bar{
 width:100%;
 background:#ddd;
-height:20px;
+height:18px;
 border-radius:5px;
 }
 
 .progress-fill{
 background:#28a745;
-height:20px;
+height:18px;
 border-radius:5px;
 }
 
+.back-btn{
+display:inline-block;
+margin-top:20px;
+padding:10px 20px;
+background:#2a5298;
+color:white;
+text-decoration:none;
+border-radius:5px;
+}
+
+.back-btn:hover{
+background:#1e3c72;
+}
+
 </style>
+
+<script>
+
+function showSection(section){
+
+document.getElementById("pending").style.display="none";
+document.getElementById("progress").style.display="none";
+document.getElementById("completed").style.display="none";
+
+document.getElementById(section).style.display="block";
+
+}
+
+window.onload=function(){
+showSection("pending");
+}
+
+</script>
+
 </head>
 
 <body>
 
 <h2>All Project Progress</h2>
 
-{% for data in project_data %}
+<button onclick="showSection('pending')">Pending</button>
+<button onclick="showSection('progress')">In Progress</button>
+<button onclick="showSection('completed')">Completed</button>
+
+<!-- ================= PENDING ================= -->
+
+<div id="pending" class="section">
+
+<h3>Pending Projects</h3>
+
+{% for data in pending_projects %}
 
 <div class="project-box">
 
 <h3>{{ data.project.project_name }}</h3>
-<p><b>Project Manager:</b> {{ data.project.created_by.username }}</p>
 
 <p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
 
 <div class="progress-bar">
-    <div class="progress-fill"
-         style="width: {{ data.progress|default:'0' }}%;">
-    </div>
+<div class="progress-fill" style="width:{{ data.progress }}%"></div>
 </div>
 
-
-
-<br>
+<h4>Task Progress</h4>
 
 <table>
 
 <tr>
 <th>Employee</th>
-<th>Task</th>
+<th>Task Role</th>
 <th>Progress</th>
 </tr>
 
@@ -94,7 +156,7 @@ border-radius:5px;
 {% empty %}
 
 <tr>
-<td colspan="3">No allocations yet</td>
+<td colspan="3">No tasks assigned</td>
 </tr>
 
 {% endfor %}
@@ -103,11 +165,112 @@ border-radius:5px;
 
 </div>
 
+{% empty %}
+<p>No pending projects</p>
 {% endfor %}
 
-<br>
+</div>
 
-<a href="/admin-dashboard/">Back to Dashboard</a>
+
+<!-- ================= IN PROGRESS ================= -->
+
+<div id="progress" class="section">
+
+<h3>In Progress Projects</h3>
+
+{% for data in processing_projects %}
+
+<div class="project-box">
+
+<h3>{{ data.project.project_name }}</h3>
+
+<p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
+
+<div class="progress-bar">
+<div class="progress-fill" style="width:{{ data.progress }}%"></div>
+</div>
+
+<h4>Task Progress</h4>
+
+<table>
+
+<tr>
+<th>Employee</th>
+<th>Task Role</th>
+<th>Progress</th>
+</tr>
+
+{% for alloc in data.allocations %}
+
+<tr>
+<td>{{ alloc.employee.full_name }}</td>
+<td>{{ alloc.task_role }}</td>
+<td>{{ alloc.progress }}%</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% empty %}
+<p>No projects in progress</p>
+{% endfor %}
+
+</div>
+
+
+<!-- ================= COMPLETED ================= -->
+
+<div id="completed" class="section">
+
+<h3>Completed Projects</h3>
+
+{% for data in completed_projects %}
+
+<div class="project-box">
+
+<h3>{{ data.project.project_name }}</h3>
+
+<p><b>Overall Progress:</b> {{ data.progress|floatformat:0 }}%</p>
+
+<div class="progress-bar">
+<div class="progress-fill" style="width:{{ data.progress }}%"></div>
+</div>
+
+<h4>Task Progress</h4>
+
+<table>
+
+<tr>
+<th>Employee</th>
+<th>Task Role</th>
+<th>Progress</th>
+</tr>
+
+{% for alloc in data.allocations %}
+
+<tr>
+<td>{{ alloc.employee.full_name }}</td>
+<td>{{ alloc.task_role }}</td>
+<td>{{ alloc.progress }}%</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% empty %}
+<p>No completed projects</p>
+{% endfor %}
+
+</div>
+
+
+<a class="back-btn" href="/admin-dashboard/">Back to Dashboard</a>
 
 </body>
 </html>
