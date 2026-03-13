@@ -32,7 +32,7 @@ class EmployeeProfile(models.Model):
 class Project(models.Model):
     project_name = models.CharField(max_length=100)
     project_description = models.TextField()
-    max_employees = models.IntegerField(default=5)
+    max_employees = models.IntegerField()
 
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
