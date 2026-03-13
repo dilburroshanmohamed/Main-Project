@@ -674,18 +674,21 @@ def edit_employee(request, emp_id):
 
 
 
+
 @login_required
 def delete_employee(request, emp_id):
 
     if not request.user.is_superuser:
         return redirect('/')
 
-    employee = get_object_or_404(EmployeeProfile, id=emp_id)
+    employee = EmployeeProfile.objects.get(id=emp_id)
 
-    # delete employee profile
-    employee.delete()
+    # delete user (this deletes employee profile automatically)
+    employee.user.delete()
 
-    return redirect('view_employees')
+    return redirect('/view-employees/')
+
+
 
 
 
