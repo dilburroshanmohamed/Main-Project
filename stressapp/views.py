@@ -442,35 +442,88 @@ def emp_projects(request):
         'total_allocated_hours': total_hours
     })
 
+
+
+    
+
+from django.db.models import Sum
+
 @login_required
 def emp_stress_form(request):
+
     profile = EmployeeProfile.objects.get(user=request.user)
+
+    allocations = ProjectAllocation.objects.filter(employee=profile)
+
+    allocations = ProjecstAllocation.objects.filter(
+    employee=profile,
+    project__status__in=['pending', 'in_progress']
+)
+
+
+    total_allocated_hours = allocations.aggregate(
+        Sum('allocated_hours_per_week')
+    )['allocated_hours_per_week__sum'] or 0
+
     score = status = recommendation = None
 
     if request.method == 'POST':
-        workload = float(request.POST['workload_score'])
-        satisfaction = float(request.POST['job_satisfaction'])
-        sleep = float(request.POST['sleep_hours'])
-        activity = float(request.POST['physical_activity'])
-        caffeine = float(request.POST['caffeine'])
-        stress = float(request.POST['stress_level'])
 
-        score = (workload*2 + stress*2 - satisfaction + caffeine*0.5 - sleep + activity*0.5)
+        work_exp = profile.work_experience
+        work_hours = total_allocated_hours
+        remote = request.POST.get("remote_work")
+        workload = request.POST.get("workload_score")
+        satisfaction = request.POST.get("job_satisfaction")
+        sleep = request.POST.get("sleep_hours")
+        activity = request.POST.get("physical_activity_hrs")
+        caffeine = request.POST.get("caffeine_intake")
+        stress = request.POST.get("stress_level")
+
+        score = (float(workload)*2 + float(stress)*2 - float(satisfaction)
+                 + float(caffeine)*0.5 - float(sleep) + float(activity)*0.5)
+
         if score < 40:
-            status, recommendation = "High Risk", "Please consult HR or a counselor."
-        elif score < 70:
-            status, recommendation = "Medium Risk", "Maintain balance and monitor stress."
-        else:
-            status, recommendation = "Healthy", "Keep up your good habits."
+            status = "High Risk"
+            recommendation = "Please consult HR or counselor"
 
-        StressRecord.objects.create(user=request.user, mental_health_score=score)
+        elif score < 70:
+            status = "Medium Risk"
+            recommendation = "Maintain balance"
+
+        else:
+            status = "Healthy"
+            recommendation = "Keep up your good habits"
+
+        StressRecord.objects.create(
+            user=request.user,
+            work_experience=work_exp,
+            work_hours_per_week=work_hours,
+            remote_work=remote,
+            workload_score=workload,
+            job_satisfaction=satisfaction,
+            sleep_hours=sleep,
+            physical_activity_hrs=activity,
+            caffeine_intake=caffeine,
+            stress_level=stress,
+            mental_health_score=score
+        )
 
     return render(request, 'emp/emp_stress_form.html', {
         'profile': profile,
+        'total_allocated_hours': total_allocated_hours,
         'score': score,
         'status': status,
         'recommendation': recommendation
     })
+
+
+
+
+
+
+
+
+
 
 @login_required
 def emp_history(request):

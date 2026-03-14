@@ -29,7 +29,16 @@ class EmployeeProfile(models.Model):
         return self.full_name
 
 
+
+
 class Project(models.Model):
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+
     project_name = models.CharField(max_length=100)
     project_description = models.TextField()
     max_employees = models.IntegerField()
@@ -39,11 +48,23 @@ class Project(models.Model):
 
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
     def total_days(self):
-        return (self.end_date - self.start_date).days
+        if self.start_date and self.end_date:
+            return (self.end_date - self.start_date).days
+        return None
 
     def __str__(self):
         return self.project_name
+
+
+
+
 
 
 class ProjectAllocation(models.Model):
@@ -75,16 +96,26 @@ class ProjectAllocation(models.Model):
     class Meta:
         unique_together = ('employee', 'project')
 
+
+
+
 class StressRecord(models.Model):
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    work_experience = models.IntegerField()
     work_hours_per_week = models.FloatField()
+    remote_work = models.IntegerField()
+
     workload_score = models.FloatField()
     job_satisfaction = models.FloatField()
     sleep_hours = models.FloatField()
     physical_activity_hrs = models.FloatField()
     caffeine_intake = models.FloatField()
     stress_level = models.FloatField()
+
     mental_health_score = models.FloatField()
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
