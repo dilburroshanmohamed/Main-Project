@@ -1,110 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Previous Records</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f4f6f9;
-            margin: 0;
-            padding: 40px;
-        }
+<title>Stress History</title>
 
-        .records-card {
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            padding: 30px;
-        }
+<style>
 
-        .records-card h2 {
-            text-align: center;
-            color: #2a5298;
-            margin-bottom: 25px;
-            font-size: 26px;
-        }
+body{
+font-family: Arial;
+background:#f4f6f9;
+padding:40px;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+.box{
+background:white;
+padding:25px;
+border-radius:8px;
+box-shadow:0px 5px 15px rgba(0,0,0,0.1);
+}
 
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
+h2{
+color:#2a5298;
+margin-bottom:20px;
+}
 
-        th {
-            background: linear-gradient(90deg, #2a5298, #17a2b8);
-            color: white;
-        }
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
 
-        tr:nth-child(even) { background: #f9fafb; }
-        tr:hover { background: #e0f2fe; }
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
+}
 
-        .average {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #2a5298;
-            text-align: center;
-        }
+th{
+background:#2a5298;
+color:white;
+}
 
-        .btn {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 20px;
-            background: linear-gradient(90deg, #2a5298, #1e3c72);
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
+tr:hover{
+background:#f2f2f2;
+}
 
-        .btn:hover {
-            background: linear-gradient(90deg, #17a2b8, #117a8b);
-        }
+.back{
+display:inline-block;
+margin-top:20px;
+padding:10px 20px;
+background:#2a5298;
+color:white;
+text-decoration:none;
+border-radius:5px;
+}
 
-        .btn-container {
-            text-align: center;
-        }
-    </style>
+.back:hover{
+background:#1e3c72;
+}
+
+</style>
+
 </head>
+
 <body>
 
-<div class="records-card">
-    <h2><i class="fas fa-history"></i> Previous Records</h2>
+<div class="box">
 
-    <table>
-        <tr><th>Date</th><th>Score</th></tr>
-        {% for record in records %}
-        <tr>
-            <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
-            <td>{{ record.mental_health_score|floatformat:2 }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="2">No records yet.</td></tr>
-        {% endfor %}
-    </table>
+<h2>Previous Stress Records</h2>
 
-    {% if personal_avg %}
-    <p class="average"><i class="fas fa-chart-line"></i> Your Average Score: {{ personal_avg|floatformat:2 }}</p>
-    {% endif %}
+<table>
 
-    <div class="btn-container">
-        <a href="{% url 'emp_dashboard' %}" class="btn-link">← Back to Dashboard</a>
+<tr>
 
-    </div>
+<th>Date</th>
+<th>Work Experience</th>
+<th>Work Hours / Week</th>
+<th>Remote Work</th>
+<th>Workload Score</th>
+<th>Job Satisfaction</th>
+<th>Sleep Hours</th>
+<th>Physical Activity</th>
+<th>Caffeine Intake</th>
+<th>Stress Level</th>
+<th>Mental Health Score</th>
+
+</tr>
+
+{% for record in records %}
+
+<tr>
+
+<td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+
+<td>{{ record.work_experience }}</td>
+
+<td>{{ record.work_hours_per_week }}</td>
+
+<td>
+{% if record.remote_work == 1 %}
+Yes
+{% else %}
+No
+{% endif %}
+</td>
+
+<td>{{ record.workload_score }}</td>
+
+<td>{{ record.job_satisfaction }}</td>
+
+<td>{{ record.sleep_hours }}</td>
+
+<td>{{ record.physical_activity_hrs }}</td>
+
+<td>{{ record.caffeine_intake }}</td>
+
+<td>{{ record.stress_level }}</td>
+
+<td>{{ record.mental_health_score|floatformat:2 }}</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="11">No records found</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<a class="back" href="/employee-dashboard/">Back to Dashboard</a>
+
 </div>
 
 </body>

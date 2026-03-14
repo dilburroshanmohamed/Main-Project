@@ -455,7 +455,7 @@ def emp_stress_form(request):
 
     allocations = ProjectAllocation.objects.filter(employee=profile)
 
-    allocations = ProjecstAllocation.objects.filter(
+    allocations = ProjectAllocation.objects.filter(
     employee=profile,
     project__status__in=['pending', 'in_progress']
 )
